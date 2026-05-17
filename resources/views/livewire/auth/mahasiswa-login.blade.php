@@ -3,21 +3,21 @@
         <!-- Brand Logo -->
         <div class="brand-logo">
             <div class="icon-wrapper">
-                <i class="fas fa-layer-group"></i>
+                <i class="fas fa-user-graduate"></i>
             </div>
-            <h1>Welcome Back</h1>
-            <p>Sign in to continue to KIPTEDX</p>
+            <h1>Login Mahasiswa</h1>
+            <p>Masuk ke portal khusus KIPTEDX</p>
         </div>
 
         <!-- Login Form -->
         <form wire:submit="submit">
-            <!-- Email Field -->
+            <!-- NIM Field -->
             <div class="form-floating position-relative">
-                <i class="fas fa-envelope input-icon"></i>
-                <input type="email" wire:model="email" class="form-control @error('email') is-invalid @enderror"
-                    id="email" placeholder="Email Address" autofocus>
-                <label for="email">Email Address</label>
-                @error('email')
+                <i class="fas fa-id-card input-icon"></i>
+                <input type="text" wire:model="nim" class="form-control @error('nim') is-invalid @enderror"
+                    id="nim" placeholder="Nomor Induk Mahasiswa" autofocus>
+                <label for="nim">NIM</label>
+                @error('nim')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
@@ -49,33 +49,30 @@
                 }
             </script>
 
-            <!-- Remember Me & Forgot Password -->
+            <!-- Remember Me -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="form-check mb-0">
                     <input class="form-check-input" type="checkbox" wire:model="remember" id="remember">
-                    <label class="form-check-label" for="remember">Remember me</label>
+                    <label class="form-check-label" for="remember">Ingat Saya</label>
                 </div>
-                <a href="#" class="forgot-password">Forgot Password?</a>
             </div>
 
             <!-- Login Button -->
             <button type="submit" class="btn btn-login" wire:loading.attr="disabled">
-                <span wire:loading.remove>Sign In <i class="fas fa-arrow-right"></i></span>
+                <span wire:loading.remove>Masuk <i class="fas fa-arrow-right"></i></span>
                 <span wire:loading>
-                    <i class="fas fa-spinner fa-spin me-2"></i> Signing in...
+                    <i class="fas fa-spinner fa-spin me-2"></i> Memproses...
                 </span>
             </button>
         </form>
 
         <!-- Divider -->
         <div class="divider">
-            <span>or continue with</span>
+            <span>Admin Portal</span>
         </div>
 
-
-        <!-- Sign Up Link -->
         <div class="signup-link">
-            Don't have an account? <a href="{{ route('register') }}">Create Account</a>
+            Bukan mahasiswa? <a href="{{ route('login') }}">Login Admin</a>
         </div>
     </div>
 </div>

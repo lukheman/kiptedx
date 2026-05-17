@@ -1,5 +1,5 @@
 @props([
-    'title' => 'AdminPro - Modern Admin Dashboard',
+    'title' => 'KIPTEDX - Modern Admin Dashboard',
     'description' => 'A beautiful, modern admin dashboard template built with Laravel, Livewire, and Tailwind CSS',
     'type' => 'guest',
 ])
@@ -22,31 +22,31 @@
 
     <style>
         :root {
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary-color: #0ea5e9;
+            --primary-color: #e62b1e;
+            --primary-dark: #b82218;
+            --primary-light: #eb554a;
+            --secondary-color: #000000;
             --success-color: #10b981;
             --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --bg-light: #f8fafc;
+            --danger-color: #e62b1e;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --bg-light: #f9f9f9;
             --bg-white: #ffffff;
         }
 
         [data-theme="dark"] {
-            --primary-color: #818cf8;
-            --primary-dark: #6366f1;
-            --primary-light: #a5b4fc;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --bg-light: #0f172a;
-            --bg-white: #1e293b;
+            --primary-color: #e62b1e;
+            --primary-dark: #b82218;
+            --primary-light: #eb554a;
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #333333;
+            --bg-light: #000000;
+            --bg-white: #111111;
         }
 
         * {
@@ -81,7 +81,7 @@
         }
 
         [data-theme="dark"] .site-navbar {
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(17, 17, 17, 0.95);
         }
 
         .site-navbar-container {
@@ -382,7 +382,7 @@
         .auth-section {
             min-height: calc(100vh - 73px);
             margin-top: 73px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #000000 0%, #111111 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -453,12 +453,12 @@
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             padding: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(229, 231, 235, 0.5);
             animation: slideUp 0.6s ease-out;
         }
 
@@ -528,13 +528,13 @@
             padding: 1rem 1rem 1rem 3rem;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: #f8fafc;
+            background: #f9f9f9;
         }
 
         .form-floating .form-control:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            background: white;
+            box-shadow: 0 0 0 4px rgba(230, 43, 30, 0.1);
+            background: #ffffff;
         }
 
         .form-floating label {
@@ -685,7 +685,7 @@
             height: 50px;
             border: 2px solid var(--border-color);
             border-radius: 12px;
-            background: white;
+            background: var(--bg-white);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -698,7 +698,7 @@
 
         .btn-social:hover {
             border-color: var(--primary-color);
-            background: #f8fafc;
+            background: var(--bg-light);
             transform: translateY(-2px);
         }
 
@@ -774,7 +774,7 @@
         <div class="site-navbar-container">
             <a href="/" class="site-brand">
                 <i class="fas fa-layer-group"></i>
-                <span>AdminPro</span>
+                <span>KIPTEDX</span>
             </a>
 
             <ul class="site-nav">
@@ -820,7 +820,7 @@
                     <div class="footer-brand">
                         <a href="/" class="site-brand">
                             <i class="fas fa-layer-group"></i>
-                            <span>AdminPro</span>
+                            <span>KIPTEDX</span>
                         </a>
                         <p>A modern, elegant admin dashboard template built with Laravel, Livewire, and Tailwind CSS.</p>
                     </div>
@@ -857,7 +857,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; {{ date('Y') }} AdminPro. All rights reserved.</p>
+                    <p>&copy; {{ date('Y') }} KIPTEDX. All rights reserved.</p>
                     <div class="footer-social">
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-github"></i></a>

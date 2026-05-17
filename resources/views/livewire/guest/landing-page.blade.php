@@ -213,7 +213,7 @@
             <div class="cta-card">
                 <div class="cta-content">
                     <h2>Ready to Build Something Amazing?</h2>
-                    <p>Get started with AdminPro today and create stunning admin dashboards in minutes.</p>
+                    <p>Get started with KIPTEDX today and create stunning admin dashboards in minutes.</p>
                     <div class="cta-actions">
                         <a href="{{ route('login') }}" class="btn btn-white btn-lg">
                             <i class="fas fa-rocket"></i>

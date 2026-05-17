@@ -1,6 +1,6 @@
 @props([
     'title' => 'Modern Admin Dashboard',
-    'brandName' => 'AdminPro',
+    'brandName' => 'KIPTEDX',
     'brandIcon' => 'fas fa-layer-group'
 ])
 
@@ -20,40 +20,40 @@
         :root {
             --sidebar-width: 280px;
             --topbar-height: 70px;
-            --primary-color: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary-color: #0ea5e9;
+            --primary-color: #e62b1e;
+            --primary-dark: #b82218;
+            --primary-light: #eb554a;
+            --secondary-color: #000000;
             --success-color: #10b981;
             --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --danger-color: #e62b1e;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
 
-            /* Light theme (default) */
-            --bg-primary: #f1f5f9;
+            /* Light theme (TEDx style) */
+            --bg-primary: #f9f9f9;
             --bg-secondary: #ffffff;
-            --bg-tertiary: #f8fafc;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --border-light: #f1f5f9;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
             --input-bg: #ffffff;
-            --hover-bg: #f8fafc;
+            --hover-bg: #f3f4f6;
         }
 
         [data-theme="dark"] {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --border-light: #475569;
-            --input-bg: #1e293b;
-            --hover-bg: #334155;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.4);
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --bg-tertiary: #222222;
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #333333;
+            --border-light: #444444;
+            --input-bg: #111111;
+            --hover-bg: #222222;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.5);
         }
 
         * {
@@ -157,14 +157,27 @@
             transition: background-color 0.3s ease;
         }
 
-        .topbar .form-control {
-            background: var(--input-bg);
+        .form-control, .form-select {
+            background-color: var(--input-bg);
             border-color: var(--border-color);
             color: var(--text-primary);
+            transition: all 0.2s ease-in-out;
         }
 
-        .topbar .form-control::placeholder {
+        .form-control:focus, .form-select:focus {
+            background-color: var(--input-bg);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.25rem rgba(230, 43, 30, 0.25);
+        }
+
+        .form-control::placeholder {
             color: var(--text-muted);
+        }
+
+        .form-control:disabled, .form-control[readonly] {
+            background-color: var(--hover-bg);
+            opacity: 0.8;
         }
 
         .topbar .input-group-text {
@@ -246,6 +259,26 @@
             color: white;
             font-weight: 600;
             font-size: 0.875rem;
+        }
+
+        input[type="file"].form-control::file-selector-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            margin-right: 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        input[type="file"].form-control::file-selector-button:hover {
+            background-color: #c02015;
+            color: white;
+        }
+
+        [data-theme="dark"] input[type="file"].form-control::file-selector-button {
+            background-color: var(--primary-color);
         }
 
         .badge-modern {
@@ -572,26 +605,35 @@
     <!-- Sidebar -->
     <x-sidebar :brand-name="$brandName" :brand-icon="$brandIcon">
         <x-sidebar-section title="Main">
-            <x-sidebar-link href="{{ route('dashboard') }}" icon="fas fa-home" :active="request()->routeIs('dashboard')">Dashboard</x-sidebar-link>
-            <x-sidebar-link href="{{ route('admin.users') }}" icon="fas fa-users" :active="request()->routeIs('admin.users')">Users</x-sidebar-link>
+            @if(Auth::guard('mahasiswa')->check())
+                <x-sidebar-link href="{{ route('mahasiswa.dashboard') }}" icon="fas fa-home" :active="request()->routeIs('mahasiswa.dashboard')">Dashboard</x-sidebar-link>
+                <x-sidebar-link href="{{ route('mahasiswa.slides') }}" icon="fas fa-images" :active="request()->routeIs('mahasiswa.slides')">Tema dan Persentase</x-sidebar-link>
+            @else
+                <x-sidebar-link href="{{ route('dashboard') }}" icon="fas fa-home" :active="request()->routeIs('dashboard')">Dashboard</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.users') }}" icon="fas fa-users" :active="request()->routeIs('admin.users')">Users</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.mahasiswa') }}" icon="fas fa-user-graduate" :active="request()->routeIs('admin.mahasiswa')">Mahasiswa</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.urutan') }}" icon="fas fa-sort-numeric-down" :active="request()->routeIs('admin.urutan')">Urutan Tampil</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.tema') }}" icon="fas fa-tags" :active="request()->routeIs('admin.tema')">Tema</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.juri') }}" icon="fas fa-user-tie" :active="request()->routeIs('admin.juri')">Juri</x-sidebar-link>
+            @endif
         </x-sidebar-section>
 
         <x-sidebar-section title="Account">
-            <x-sidebar-link href="{{ route('admin.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('admin.profile')">Profile</x-sidebar-link>
-            <x-sidebar-link href="#settings" icon="fas fa-cog">Settings</x-sidebar-link>
+            @if(Auth::guard('mahasiswa')->check())
+                <x-sidebar-link href="{{ route('mahasiswa.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('mahasiswa.profile')">Profile</x-sidebar-link>
+            @else
+                <x-sidebar-link href="{{ route('admin.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('admin.profile')">Profile</x-sidebar-link>
+            @endif
         </x-sidebar-section>
 
-        <x-sidebar-section title="Developer">
-            <x-sidebar-link href="{{ route('admin.components') }}" icon="fas fa-cubes" :active="request()->routeIs('admin.components')">Components</x-sidebar-link>
-        </x-sidebar-section>
     </x-sidebar>
 
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Bar -->
         <x-topbar
-            :user-name="Auth::user()?->name ?? 'Guest'"
-            user-role="Administrator"
+            :user-name="Auth::guard('mahasiswa')->check() ? Auth::guard('mahasiswa')->user()->nama : (Auth::user()?->name ?? 'Guest')"
+            :user-role="Auth::guard('mahasiswa')->check() ? 'Mahasiswa' : 'Administrator'"
             :notification-count="0"
             :show-logout="true"
         />
