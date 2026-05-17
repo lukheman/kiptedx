@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Mahasiswa;
 use Illuminate\Database\Seeder;
 
 class MahasiswaSeeder extends Seeder
@@ -42,7 +42,7 @@ class MahasiswaSeeder extends Seeder
         ];
 
         foreach ($data as $mhs) {
-            \App\Models\Mahasiswa::create([
+            Mahasiswa::create([
                 'nim' => $mhs['nim'],
                 'nama' => $mhs['nama'],
                 'password' => bcrypt('password123'),

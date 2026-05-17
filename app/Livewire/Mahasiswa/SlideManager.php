@@ -2,24 +2,28 @@
 
 namespace App\Livewire\Mahasiswa;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Livewire\Component;
-use Livewire\Attributes\Title;
-use Livewire\WithFileUploads;
 use App\Models\SlidePresentasi;
 use App\Models\Tema;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Title('Tema dan Persentase')]
 class SlideManager extends Component
 {
     use WithFileUploads;
 
-    public $judul_slides = [];
-    public $file_gambars = [];
+    public $slides = [];
+
     public $existing_slides = [];
+
     public $uploadedCount = 0;
+
     public $selected_tema = null;
+
+    public $maxSlides = 5;
 
     public function mount()
     {
@@ -33,13 +37,11 @@ class SlideManager extends Component
         $slides = $mahasiswa->slidePresentasis()->get()->keyBy('urutan');
         $this->uploadedCount = $slides->count();
 
-        for ($i = 1; $i <= 5; $i++) {
-            if ($slides->has($i)) {
+        for ($i = 0; $i < $this->maxSlides; $i++) {
+            if (isset($slides[$i])) {
                 $this->existing_slides[$i] = $slides[$i];
-                $this->judul_slides[$i] = $slides[$i]->judul_slide;
             } else {
                 $this->existing_slides[$i] = null;
-                $this->judul_slides[$i] = '';
             }
         }
     }
@@ -47,17 +49,15 @@ class SlideManager extends Component
     public function saveSlide($urutan)
     {
         $this->validate([
-            "judul_slides.$urutan" => 'required|string|max:255',
-            "file_gambars.$urutan" => 'required|image|max:2048', // max 2MB
+            "slides.$urutan" => 'required|image|max:2048',
         ], [
-            "judul_slides.$urutan.required" => 'Judul slide wajib diisi.',
-            "file_gambars.$urutan.required" => 'File gambar wajib diunggah.',
-            "file_gambars.$urutan.image" => 'File harus berupa gambar.',
-            "file_gambars.$urutan.max" => 'Ukuran gambar maksimal 2MB.',
+            "slides.$urutan.required" => 'File gambar wajib diunggah.',
+            "slides.$urutan.image" => 'File harus berupa gambar.',
+            "slides.$urutan.max" => 'Ukuran file maksimal 2MB.',
         ]);
 
         $mahasiswa = Auth::guard('mahasiswa')->user();
-        $path = $this->file_gambars[$urutan]->store('slides', 'public');
+        $path = $this->slides[$urutan]->store('slides', 'public');
 
         // Delete old file if exists
         $slide = SlidePresentasi::where('mahasiswa_id', $mahasiswa->id)->where('urutan', $urutan)->first();
@@ -67,13 +67,13 @@ class SlideManager extends Component
 
         SlidePresentasi::updateOrCreate(
             ['mahasiswa_id' => $mahasiswa->id, 'urutan' => $urutan],
-            ['judul_slide' => $this->judul_slides[$urutan], 'file_gambar' => $path]
+            ['file_gambar' => $path]
         );
 
-        $this->file_gambars[$urutan] = null;
+        $this->slides[$urutan] = null;
         $this->loadSlides();
 
-        session()->flash('success_slide_' . $urutan, 'Slide berhasil disimpan.');
+        session()->flash('success_slide_'.$urutan, 'Slide berhasil disimpan.');
         $this->dispatch('slide-updated');
     }
 
@@ -89,9 +89,9 @@ class SlideManager extends Component
             $slide->delete();
         }
 
-        $this->judul_slides[$urutan] = '';
+        unset($this->slides[$urutan]);
         $this->loadSlides();
-        session()->flash('success_slide_' . $urutan, 'Slide berhasil dihapus.');
+        session()->flash('success_slide_'.$urutan, 'Slide berhasil dihapus.');
         $this->dispatch('slide-updated');
     }
 

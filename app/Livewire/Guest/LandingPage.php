@@ -7,7 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.guest')]
-#[Title('KIPTEDX - Modern Admin Dashboard Template')]
+#[Title('KIP TALKS - Modern Admin Dashboard Template')]
 class LandingPage extends Component
 {
     public function render()

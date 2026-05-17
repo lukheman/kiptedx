@@ -9,8 +9,8 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.guest')]
-#[Title('Login Mahasiswa - KIP TALKS')]
-class MahasiswaLogin extends Component
+#[Title('Login Juri - KIP TALKS')]
+class JuriLogin extends Component
 {
     #[Rule(['required', 'string'])]
     public string $nim = '';
@@ -29,18 +29,18 @@ class MahasiswaLogin extends Component
             'password' => $this->password,
         ];
 
-        if (Auth::guard('mahasiswa')->attempt($credentials, $this->remember)) {
+        if (Auth::guard('juri')->attempt($credentials, $this->remember)) {
             session()->regenerate();
 
-            return redirect()->to(route('mahasiswa.dashboard'));
+            return redirect()->to(route('juri.presentasi'));
         }
 
-        $this->addError('nim', 'NIM atau Password salah.');
+        $this->addError('nim', 'NIM/NIP atau Password salah.');
     }
 
     public function render()
     {
-        return view('livewire.auth.mahasiswa-login')
+        return view('livewire.auth.juri-login')
             ->layoutData(['type' => 'auth']);
     }
 }

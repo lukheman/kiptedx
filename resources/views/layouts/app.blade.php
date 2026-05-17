@@ -1,6 +1,6 @@
 @props([
     'title' => 'Modern Admin Dashboard',
-    'brandName' => 'KIPTEDX',
+    'brandName' => 'KIP TALKS',
     'brandIcon' => 'fas fa-layer-group'
 ])
 
@@ -605,7 +605,9 @@
     <!-- Sidebar -->
     <x-sidebar :brand-name="$brandName" :brand-icon="$brandIcon">
         <x-sidebar-section title="Main">
-            @if(Auth::guard('mahasiswa')->check())
+            @if(Auth::guard('juri')->check())
+                <x-sidebar-link href="{{ route('juri.presentasi') }}" icon="fas fa-chalkboard-teacher" :active="request()->routeIs('juri.presentasi')">Presentasi</x-sidebar-link>
+            @elseif(Auth::guard('mahasiswa')->check())
                 <x-sidebar-link href="{{ route('mahasiswa.dashboard') }}" icon="fas fa-home" :active="request()->routeIs('mahasiswa.dashboard')">Dashboard</x-sidebar-link>
                 <x-sidebar-link href="{{ route('mahasiswa.slides') }}" icon="fas fa-images" :active="request()->routeIs('mahasiswa.slides')">Tema dan Persentase</x-sidebar-link>
             @else
@@ -615,11 +617,14 @@
                 <x-sidebar-link href="{{ route('admin.urutan') }}" icon="fas fa-sort-numeric-down" :active="request()->routeIs('admin.urutan')">Urutan Tampil</x-sidebar-link>
                 <x-sidebar-link href="{{ route('admin.tema') }}" icon="fas fa-tags" :active="request()->routeIs('admin.tema')">Tema</x-sidebar-link>
                 <x-sidebar-link href="{{ route('admin.juri') }}" icon="fas fa-user-tie" :active="request()->routeIs('admin.juri')">Juri</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.presentasi') }}" icon="fas fa-chalkboard-teacher" :active="request()->routeIs('admin.presentasi')">Kontrol Presentasi</x-sidebar-link>
             @endif
         </x-sidebar-section>
 
         <x-sidebar-section title="Account">
-            @if(Auth::guard('mahasiswa')->check())
+            @if(Auth::guard('juri')->check())
+                {{-- Juri has no profile page, just show presentasi --}}
+            @elseif(Auth::guard('mahasiswa')->check())
                 <x-sidebar-link href="{{ route('mahasiswa.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('mahasiswa.profile')">Profile</x-sidebar-link>
             @else
                 <x-sidebar-link href="{{ route('admin.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('admin.profile')">Profile</x-sidebar-link>
@@ -631,9 +636,21 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Bar -->
+        @php
+            if (Auth::guard('juri')->check()) {
+                $topName = Auth::guard('juri')->user()->nama;
+                $topRole = 'Juri';
+            } elseif (Auth::guard('mahasiswa')->check()) {
+                $topName = Auth::guard('mahasiswa')->user()->nama;
+                $topRole = 'Mahasiswa';
+            } else {
+                $topName = Auth::user()?->name ?? 'Guest';
+                $topRole = 'Administrator';
+            }
+        @endphp
         <x-topbar
-            :user-name="Auth::guard('mahasiswa')->check() ? Auth::guard('mahasiswa')->user()->nama : (Auth::user()?->name ?? 'Guest')"
-            :user-role="Auth::guard('mahasiswa')->check() ? 'Mahasiswa' : 'Administrator'"
+            :user-name="$topName"
+            :user-role="$topRole"
             :notification-count="0"
             :show-logout="true"
         />

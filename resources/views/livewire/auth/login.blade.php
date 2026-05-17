@@ -6,7 +6,7 @@
                 <i class="fas fa-layer-group"></i>
             </div>
             <h1>Welcome Back</h1>
-            <p>Sign in to continue to KIPTEDX</p>
+            <p>Sign in to continue to KIP TALKS</p>
         </div>
 
         <!-- Login Form -->

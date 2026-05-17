@@ -4,46 +4,61 @@ namespace App\Livewire\Admin;
 
 use App\Models\Mahasiswa;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Title('Manajemen Mahasiswa')]
 class MahasiswaManager extends Component
 {
-    use WithPagination;
+    use WithFileUploads, WithPagination;
 
     #[Url(as: 'q')]
     public string $search = '';
 
     public string $sortBy = 'nim';
+
     public string $sortDirection = 'asc';
 
     public string $nim = '';
+
     public string $nama = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
+    public $foto_profil;
+
+    public ?string $current_foto_profil = null;
+
     public ?int $editingId = null;
+
     public bool $showModal = false;
+
     public bool $showDeleteModal = false;
+
     public ?int $deletingId = null;
 
     protected function rules(): array
     {
         $rules = [
             'nama' => ['required', 'string', 'max:255'],
+            'foto_profil' => ['nullable', 'image', 'max:2048'], // max 2MB
         ];
 
         if ($this->editingId) {
-            $rules['nim'] = ['required', 'string', 'max:50', 'unique:mahasiswas,nim,' . $this->editingId];
+            $rules['nim'] = ['required', 'string', 'max:50', 'unique:mahasiswas,nim,'.$this->editingId];
             if ($this->password) {
-                $rules['password'] = ['confirmed', \Illuminate\Validation\Rules\Password::defaults()];
+                $rules['password'] = ['confirmed', Password::defaults()];
             }
         } else {
             $rules['nim'] = ['required', 'string', 'max:50', 'unique:mahasiswas,nim'];
-            $rules['password'] = ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()];
+            $rules['password'] = ['required', 'confirmed', Password::defaults()];
         }
 
         return $rules;
@@ -67,6 +82,7 @@ class MahasiswaManager extends Component
         $this->editingId = $id;
         $this->nim = $mhs->nim;
         $this->nama = $mhs->nama;
+        $this->current_foto_profil = $mhs->foto_profil;
         $this->password = '';
         $this->password_confirmation = '';
         $this->showModal = true;
@@ -76,12 +92,24 @@ class MahasiswaManager extends Component
     {
         $validated = $this->validate();
 
+        $fotoPath = null;
+        if ($this->foto_profil) {
+            $fotoPath = $this->foto_profil->store('foto-mahasiswa', 'public');
+        }
+
         if ($this->editingId) {
             $mhs = Mahasiswa::findOrFail($this->editingId);
             $mhs->nim = $validated['nim'];
             $mhs->nama = $validated['nama'];
 
-            if (!empty($this->password)) {
+            if ($fotoPath) {
+                if ($mhs->foto_profil && Storage::disk('public')->exists($mhs->foto_profil)) {
+                    Storage::disk('public')->delete($mhs->foto_profil);
+                }
+                $mhs->foto_profil = $fotoPath;
+            }
+
+            if (! empty($this->password)) {
                 $mhs->password = Hash::make($this->password);
             }
 
@@ -92,6 +120,7 @@ class MahasiswaManager extends Component
                 'nim' => $validated['nim'],
                 'nama' => $validated['nama'],
                 'password' => Hash::make($validated['password']),
+                'foto_profil' => $fotoPath,
             ]);
             session()->flash('success', 'Data Mahasiswa berhasil ditambahkan.');
         }
@@ -115,8 +144,14 @@ class MahasiswaManager extends Component
     public function deleteMahasiswa(): void
     {
         if ($this->deletingId) {
-            Mahasiswa::destroy($this->deletingId);
-            session()->flash('success', 'Data Mahasiswa berhasil dihapus.');
+            $mhs = Mahasiswa::find($this->deletingId);
+            if ($mhs) {
+                if ($mhs->foto_profil && Storage::disk('public')->exists($mhs->foto_profil)) {
+                    Storage::disk('public')->delete($mhs->foto_profil);
+                }
+                $mhs->delete();
+                session()->flash('success', 'Data Mahasiswa berhasil dihapus.');
+            }
         }
 
         $this->showDeleteModal = false;
@@ -135,6 +170,8 @@ class MahasiswaManager extends Component
         $this->nama = '';
         $this->password = '';
         $this->password_confirmation = '';
+        $this->foto_profil = null;
+        $this->current_foto_profil = null;
         $this->editingId = null;
     }
 
@@ -155,8 +192,8 @@ class MahasiswaManager extends Component
         $mahasiswas = Mahasiswa::query()
             ->withCount('slidePresentasis')
             ->when($this->search, function ($query) {
-                $query->where('nama', 'like', '%' . $this->search . '%')
-                    ->orWhere('nim', 'like', '%' . $this->search . '%');
+                $query->where('nama', 'like', '%'.$this->search.'%')
+                    ->orWhere('nim', 'like', '%'.$this->search.'%');
             })
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate(10);

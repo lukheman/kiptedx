@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Juri;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -18,16 +19,23 @@ class JuriManager extends Component
     public string $search = '';
 
     public string $sortBy = 'nim';
+
     public string $sortDirection = 'asc';
 
     public string $nim = '';
+
     public string $nama = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public ?int $editingId = null;
+
     public bool $showModal = false;
+
     public bool $showDeleteModal = false;
+
     public ?int $deletingId = null;
 
     protected function rules(): array
@@ -37,13 +45,13 @@ class JuriManager extends Component
         ];
 
         if ($this->editingId) {
-            $rules['nim'] = ['required', 'string', 'max:50', 'unique:juris,nim,' . $this->editingId];
+            $rules['nim'] = ['required', 'string', 'max:50', 'unique:juris,nim,'.$this->editingId];
             if ($this->password) {
-                $rules['password'] = ['confirmed', \Illuminate\Validation\Rules\Password::defaults()];
+                $rules['password'] = ['confirmed', Password::defaults()];
             }
         } else {
             $rules['nim'] = ['required', 'string', 'max:50', 'unique:juris,nim'];
-            $rules['password'] = ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()];
+            $rules['password'] = ['required', 'confirmed', Password::defaults()];
         }
 
         return $rules;
@@ -81,7 +89,7 @@ class JuriManager extends Component
             $juri->nim = $validated['nim'];
             $juri->nama = $validated['nama'];
 
-            if (!empty($this->password)) {
+            if (! empty($this->password)) {
                 $juri->password = Hash::make($this->password);
             }
 
@@ -154,8 +162,8 @@ class JuriManager extends Component
     {
         $juris = Juri::query()
             ->when($this->search, function ($query) {
-                $query->where('nama', 'like', '%' . $this->search . '%')
-                    ->orWhere('nim', 'like', '%' . $this->search . '%');
+                $query->where('nama', 'like', '%'.$this->search.'%')
+                    ->orWhere('nim', 'like', '%'.$this->search.'%');
             })
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate(10);

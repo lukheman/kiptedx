@@ -18,10 +18,9 @@ class SlidePresentasiFactory extends Factory
     public function definition(): array
     {
         return [
-            'mahasiswa_id' => \App\Models\Mahasiswa::factory(),
-            'urutan' => fake()->numberBetween(1, 4),
-            'judul_slide' => fake()->sentence(),
-            'file_gambar' => 'slides/default.png',
+            'mahasiswa_id' => Mahasiswa::factory(),
+            'urutan' => fake()->numberBetween(1, 10),
+            'file_gambar' => 'slides/'.fake()->uuid().'.jpg',
         ];
     }
 }

@@ -6,23 +6,27 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-#[Title('Profile - KIPTEDX')]
+#[Title('Profile - KIP TALKS')]
 class Profile extends Component
 {
     use WithFileUploads;
 
     public string $name = '';
+
     public string $email = '';
+
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public $avatar;
+
     public ?string $currentAvatar = null;
 
     public bool $showPasswordSection = false;
@@ -39,7 +43,7 @@ class Profile extends Component
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . Auth::id()],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.Auth::id()],
         ];
 
         if ($this->showPasswordSection && $this->password) {
@@ -58,7 +62,7 @@ class Profile extends Component
 
     public function togglePasswordSection(): void
     {
-        $this->showPasswordSection = !$this->showPasswordSection;
+        $this->showPasswordSection = ! $this->showPasswordSection;
         $this->current_password = '';
         $this->password = '';
         $this->password_confirmation = '';

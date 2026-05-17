@@ -1,5 +1,5 @@
 @props([
-    'title' => 'KIPTEDX - Modern Admin Dashboard',
+    'title' => 'KIP TALKS - Modern Admin Dashboard',
     'description' => 'A beautiful, modern admin dashboard template built with Laravel, Livewire, and Tailwind CSS',
     'type' => 'guest',
 ])
@@ -769,19 +769,19 @@
 </head>
 
 <body>
-    {{-- Navbar (shared across all pages) --}}
-    <nav class="site-navbar">
+    {{-- Navbar (hidden on presentasi fullscreen layout) --}}
+    @if($type !== 'presentasi')
+        <nav class="site-navbar">
         <div class="site-navbar-container">
             <a href="/" class="site-brand">
                 <i class="fas fa-layer-group"></i>
-                <span>KIPTEDX</span>
+                <span>KIP TALKS</span>
             </a>
 
             <ul class="site-nav">
-                <li><a href="/#features" class="site-nav-link">Features</a></li>
-                <li><a href="/#components" class="site-nav-link">Components</a></li>
-                <li><a href="/#pricing" class="site-nav-link">Pricing</a></li>
-                <li><a href="/#contact" class="site-nav-link">Contact</a></li>
+                <li><a href="/#about" class="site-nav-link">Tentang</a></li>
+                <li><a href="/#features" class="site-nav-link">Fitur</a></li>
+                <li><a href="{{ route('presentasi.public') }}" class="site-nav-link text-danger fw-bold"><i class="fas fa-play-circle me-1"></i>Live</a></li>
             </ul>
 
             <div class="site-navbar-actions">
@@ -796,8 +796,16 @@
             </div>
         </div>
     </nav>
+    @endif
 
-    @if($type === 'auth')
+    @if($type === 'presentasi')
+        {{-- Presentasi Pages: fullscreen clean view --}}
+        <div style="min-height: 100vh; padding: 2rem;">
+            <div style="max-width: 1600px; margin: 0 auto;">
+                {{ $slot }}
+            </div>
+        </div>
+    @elseif($type === 'auth')
         {{-- Auth Pages: gradient section with animated shapes --}}
         <section class="auth-section">
             <div class="bg-shapes">
@@ -820,49 +828,9 @@
                     <div class="footer-brand">
                         <a href="/" class="site-brand">
                             <i class="fas fa-layer-group"></i>
-                            <span>KIPTEDX</span>
+                            <span>KIP TALKS</span>
                         </a>
-                        <p>A modern, elegant admin dashboard template built with Laravel, Livewire, and Tailwind CSS.</p>
-                    </div>
-
-                    <div class="footer-links">
-                        <div class="footer-column">
-                            <h4>Product</h4>
-                            <ul>
-                                <li><a href="#features">Features</a></li>
-                                <li><a href="#components">Components</a></li>
-                                <li><a href="#pricing">Pricing</a></li>
-                                <li><a href="#">Changelog</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-column">
-                            <h4>Resources</h4>
-                            <ul>
-                                <li><a href="#">Documentation</a></li>
-                                <li><a href="#">Tutorials</a></li>
-                                <li><a href="#">Blog</a></li>
-                                <li><a href="#">Support</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-column">
-                            <h4>Company</h4>
-                            <ul>
-                                <li><a href="#">About</a></li>
-                                <li><a href="#">Careers</a></li>
-                                <li><a href="#">Privacy</a></li>
-                                <li><a href="#">Terms</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="footer-bottom">
-                    <p>&copy; {{ date('Y') }} KIPTEDX. All rights reserved.</p>
-                    <div class="footer-social">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <p>Platform kompetisi presentasi mahasiswa tersinkronisasi bergaya TEDx.</p>
                     </div>
                 </div>
             </div>

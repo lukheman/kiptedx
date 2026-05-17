@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Database\Factories\MahasiswaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class Mahasiswa extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\MahasiswaFactory> */
+    /** @use HasFactory<MahasiswaFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -40,12 +42,12 @@ class Mahasiswa extends Authenticatable
 
     public function hasAvatar(): bool
     {
-        return !empty($this->foto_profil);
+        return ! empty($this->foto_profil);
     }
 
     public function avatarUrl(): string
     {
-        return $this->foto_profil ? \Illuminate\Support\Facades\Storage::url($this->foto_profil) : '';
+        return $this->foto_profil ? Storage::url($this->foto_profil) : '';
     }
 
     public function slidePresentasis()

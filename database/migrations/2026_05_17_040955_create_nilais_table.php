@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('slide_presentasis', function (Blueprint $table) {
+        Schema::create('nilais', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('juri_id')->constrained('juris')->cascadeOnDelete();
             $table->foreignId('mahasiswa_id')->constrained('mahasiswas')->cascadeOnDelete();
-            $table->integer('urutan');
-            $table->string('file_gambar');
+            $table->unsignedTinyInteger('nilai')->comment('Skor 1-100');
+            $table->text('catatan')->nullable();
             $table->timestamps();
+
+            $table->unique(['juri_id', 'mahasiswa_id']);
         });
     }
 
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('slide_presentasis');
+        Schema::dropIfExists('nilais');
     }
 };

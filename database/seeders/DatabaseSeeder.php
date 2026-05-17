@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Mahasiswa;
+use App\Models\Juri;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,7 +19,14 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
-            'password' => 'password123'
+            'password' => 'password123',
         ]);
+
+        Juri::create([
+            'nim' => '242221120',
+            'nama' => 'Juri 1',
+            'password' => bcrypt('password123'),
+        ]);
+
     }
 }

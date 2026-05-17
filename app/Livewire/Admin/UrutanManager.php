@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Mahasiswa;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -26,7 +27,7 @@ class UrutanManager extends Component
                     'id' => $mhs->id,
                     'nim' => $mhs->nim,
                     'nama' => $mhs->nama,
-                    'foto_profil' => $mhs->foto_profil ? \Illuminate\Support\Facades\Storage::url($mhs->foto_profil) : null,
+                    'foto_profil' => $mhs->foto_profil ? Storage::url($mhs->foto_profil) : null,
                     'urutan_tampil' => $mhs->urutan_tampil,
                     'urutan_dikunci' => $mhs->urutan_dikunci,
                     'slide_count' => $mhs->slidePresentasis()->count(),
@@ -48,6 +49,7 @@ class UrutanManager extends Component
             if ($existing) {
                 session()->flash('error', "Urutan {$urutan} sudah digunakan oleh {$existing->nama}.");
                 $this->loadMahasiswas();
+
                 return;
             }
         }
@@ -59,7 +61,7 @@ class UrutanManager extends Component
     public function toggleKunci($mahasiswaId)
     {
         $mhs = Mahasiswa::findOrFail($mahasiswaId);
-        $mhs->urutan_dikunci = !$mhs->urutan_dikunci;
+        $mhs->urutan_dikunci = ! $mhs->urutan_dikunci;
         $mhs->save();
         $this->loadMahasiswas();
     }

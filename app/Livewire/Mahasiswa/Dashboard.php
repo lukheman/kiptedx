@@ -3,8 +3,8 @@
 namespace App\Livewire\Mahasiswa;
 
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Dashboard Mahasiswa')]

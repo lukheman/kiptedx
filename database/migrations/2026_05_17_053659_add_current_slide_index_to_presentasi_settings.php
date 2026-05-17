@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('avatar')->nullable()->after('email');
+        Schema::table('presentasi_settings', function (Blueprint $table) {
+            $table->integer('current_slide_index')->default(0)->after('timer_remaining');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('avatar');
+        Schema::table('presentasi_settings', function (Blueprint $table) {
+            $table->dropColumn('current_slide_index');
         });
     }
 };

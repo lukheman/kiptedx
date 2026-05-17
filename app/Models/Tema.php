@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\TemaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Tema extends Model
 {
-    /** @use HasFactory<\Database\Factories\TemaFactory> */
+    /** @use HasFactory<TemaFactory> */
     use HasFactory;
 
     protected $fillable = ['judul'];

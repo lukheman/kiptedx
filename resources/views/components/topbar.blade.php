@@ -34,9 +34,22 @@
         @endif
         @php
             $isMahasiswa = Auth::guard('mahasiswa')->check();
-            $user = $isMahasiswa ? Auth::guard('mahasiswa')->user() : Auth::user();
-            $profileRoute = $isMahasiswa ? route('mahasiswa.profile') : route('admin.profile');
-            $logoutRoute = $isMahasiswa ? route('mahasiswa.logout') : route('logout');
+            $isJuri = Auth::guard('juri')->check();
+            
+            if ($isJuri) {
+                $user = Auth::guard('juri')->user();
+                $profileRoute = route('juri.presentasi');
+                $logoutRoute = route('juri.logout');
+            } elseif ($isMahasiswa) {
+                $user = Auth::guard('mahasiswa')->user();
+                $profileRoute = route('mahasiswa.profile');
+                $logoutRoute = route('mahasiswa.logout');
+            } else {
+                $user = Auth::user();
+                $profileRoute = route('admin.profile');
+                $logoutRoute = route('logout');
+            }
+            
             $hasAvatar = $user && method_exists($user, 'hasAvatar') ? $user->hasAvatar() : false;
             $avatarUrl = $hasAvatar ? $user->avatarUrl() : null;
         @endphp

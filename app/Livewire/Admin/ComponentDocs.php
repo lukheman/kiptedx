@@ -2,14 +2,14 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Component Documentation - KIPTEDX')]
+#[Title('Component Documentation - KIP TALKS')]
 class ComponentDocs extends Component
 {
     public string $activeSection = 'buttons';
+
     public string $searchQuery = '';
 
     public array $sections = [

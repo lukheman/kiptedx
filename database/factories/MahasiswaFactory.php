@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Mahasiswa;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @extends Factory<Mahasiswa>
@@ -20,7 +21,7 @@ class MahasiswaFactory extends Factory
         return [
             'nim' => fake()->unique()->numerify('##########'),
             'nama' => fake()->name(),
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'password' => Hash::make('password'),
             'foto_profil' => null,
         ];
     }

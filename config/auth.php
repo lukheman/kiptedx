@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Juri;
+use App\Models\Mahasiswa;
+use App\Models\User;
+
 return [
 
     /*
@@ -44,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'mahasiswas',
         ],
+        'juri' => [
+            'driver' => 'session',
+            'provider' => 'juris',
+        ],
     ],
 
     /*
@@ -66,11 +74,15 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
         ],
         'mahasiswas' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Mahasiswa::class,
+            'model' => Mahasiswa::class,
+        ],
+        'juris' => [
+            'driver' => 'eloquent',
+            'model' => Juri::class,
         ],
 
         // 'users' => [

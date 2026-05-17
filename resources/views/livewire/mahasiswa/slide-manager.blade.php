@@ -78,10 +78,6 @@
                         <div class="mb-3 text-center">
                             <img src="{{ Storage::url($existing_slides[$i]->file_gambar) }}" alt="Slide {{ $i }}" class="img-fluid rounded border" style="max-height: 200px; object-fit: cover;">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Judul Slide</label>
-                            <p class="fw-semibold" style="color: var(--text-primary);">{{ $existing_slides[$i]->judul_slide }}</p>
-                        </div>
                         <div class="d-flex gap-2 mt-auto">
                             <button type="button" class="btn btn-sm btn-outline-danger w-100" wire:click="deleteSlide({{ $i }})" onclick="confirm('Yakin ingin menghapus slide ini?') || event.stopImmediatePropagation()">
                                 <i class="fas fa-trash-alt me-1"></i> Hapus
@@ -91,29 +87,23 @@
                         <!-- Form to upload slide -->
                         <form wire:submit.prevent="saveSlide({{ $i }})" class="d-flex flex-column h-100">
                             <div class="mb-3">
-                                <label class="form-label">Judul Slide <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('judul_slides.'.$i) is-invalid @enderror" wire:model="judul_slides.{{ $i }}" placeholder="Contoh: Pendahuluan">
-                                @error('judul_slides.'.$i) <span class="text-danger small">{{ $message }}</span> @enderror
-                            </div>
-                            
-                            <div class="mb-3">
                                 <label class="form-label">File Gambar <span class="text-danger">*</span></label>
-                                <input type="file" class="form-control @error('file_gambars.'.$i) is-invalid @enderror" wire:model="file_gambars.{{ $i }}" accept="image/*">
-                                @error('file_gambars.'.$i) <span class="text-danger small">{{ $message }}</span> @enderror
-                                <div wire:loading wire:target="file_gambars.{{ $i }}" class="mt-2 text-primary small">
+                                <input type="file" class="form-control @error('slides.'.$i) is-invalid @enderror" wire:model="slides.{{ $i }}" accept="image/*">
+                                @error('slides.'.$i) <span class="text-danger small">{{ $message }}</span> @enderror
+                                <div wire:loading wire:target="slides.{{ $i }}" class="mt-2 text-primary small">
                                     <i class="fas fa-spinner fa-spin"></i> Mengunggah...
                                 </div>
                             </div>
                             
-                            @if (isset($file_gambars[$i]) && method_exists($file_gambars[$i], 'temporaryUrl'))
+                            @if (isset($slides[$i]) && method_exists($slides[$i], 'temporaryUrl'))
                                 <div class="mb-3 text-center">
                                     <p class="text-muted small mb-1">Preview:</p>
-                                    <img src="{{ $file_gambars[$i]->temporaryUrl() }}" class="img-fluid rounded border" style="max-height: 150px; object-fit: cover;">
+                                    <img src="{{ $slides[$i]->temporaryUrl() }}" class="img-fluid rounded border" style="max-height: 150px; object-fit: cover;">
                                 </div>
                             @endif
 
                             <div class="mt-auto">
-                                <button type="submit" class="btn btn-primary w-100" wire:loading.attr="disabled" wire:target="saveSlide({{ $i }}), file_gambars.{{ $i }}">
+                                <button type="submit" class="btn btn-primary w-100" wire:loading.attr="disabled" wire:target="saveSlide({{ $i }}), slides.{{ $i }}">
                                     <span wire:loading.remove wire:target="saveSlide({{ $i }})">
                                         <i class="fas fa-save me-1"></i> Simpan Slide {{ $i }}
                                     </span>

@@ -10,7 +10,9 @@ use Livewire\Component;
 class TemaManager extends Component
 {
     public $temas;
+
     public $judul;
+
     public $editingId = null;
 
     protected $rules = [

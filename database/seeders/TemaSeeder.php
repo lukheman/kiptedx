@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Tema;
 use Illuminate\Database\Seeder;
 
 class TemaSeeder extends Seeder
@@ -12,7 +12,7 @@ class TemaSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Tema::create([
+        Tema::create([
             'judul' => 'The Power of Innovation',
         ]);
     }

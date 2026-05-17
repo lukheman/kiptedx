@@ -18,8 +18,11 @@ class Profile extends Component
     public $mahasiswa;
 
     public $cropped_foto;
+
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function mount()
@@ -30,14 +33,14 @@ class Profile extends Component
     public function updateFotoProfil()
     {
         if ($this->cropped_foto) {
-            $image_parts = explode(";base64,", $this->cropped_foto);
-            $image_type_aux = explode("image/", $image_parts[0]);
+            $image_parts = explode(';base64,', $this->cropped_foto);
+            $image_type_aux = explode('image/', $image_parts[0]);
             $image_type = $image_type_aux[1];
             $image_base64 = base64_decode($image_parts[1]);
-            
+
             // Generate filename based on random string and extension
             $extension = str_replace('jpeg', 'jpg', $image_type);
-            $fileName = 'profiles/' . uniqid() . '.' . $extension;
+            $fileName = 'profiles/'.uniqid().'.'.$extension;
             Storage::disk('public')->put($fileName, $image_base64);
 
             if ($this->mahasiswa->foto_profil) {
@@ -60,8 +63,9 @@ class Profile extends Component
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        if (!Hash::check($this->current_password, $this->mahasiswa->password)) {
+        if (! Hash::check($this->current_password, $this->mahasiswa->password)) {
             $this->addError('current_password', 'Password saat ini salah.');
+
             return;
         }
 

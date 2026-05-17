@@ -1,5 +1,5 @@
 @props([
-    'brandName' => 'KIPTEDX',
+    'brandName' => 'KIP TALKS',
     'brandIcon' => 'fas fa-layer-group'
 ])
 

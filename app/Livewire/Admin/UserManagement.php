@@ -5,7 +5,6 @@ namespace App\Livewire\Admin;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -22,14 +21,20 @@ class UserManagement extends Component
 
     // Form fields
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     // State
     public ?int $editingUserId = null;
+
     public bool $showModal = false;
+
     public bool $showDeleteModal = false;
+
     public ?int $deletingUserId = null;
 
     protected function rules(): array
@@ -40,7 +45,7 @@ class UserManagement extends Component
         ];
 
         if ($this->editingUserId) {
-            $rules['email'][] = 'unique:users,email,' . $this->editingUserId;
+            $rules['email'][] = 'unique:users,email,'.$this->editingUserId;
             if ($this->password) {
                 $rules['password'] = ['confirmed', Password::defaults()];
             }
@@ -84,7 +89,7 @@ class UserManagement extends Component
             $user->name = $validated['name'];
             $user->email = $validated['email'];
 
-            if (!empty($this->password)) {
+            if (! empty($this->password)) {
                 $user->password = Hash::make($this->password);
             }
 
@@ -145,8 +150,8 @@ class UserManagement extends Component
     {
         $users = User::query()
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
+                $query->where('name', 'like', '%'.$this->search.'%')
+                    ->orWhere('email', 'like', '%'.$this->search.'%');
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);

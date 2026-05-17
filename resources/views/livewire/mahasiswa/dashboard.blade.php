@@ -1,5 +1,5 @@
 <div>
-    <x-page-header title="Dashboard Mahasiswa" subtitle="Selamat datang di portal mahasiswa KIPTEDX">
+    <x-page-header title="Dashboard Mahasiswa" subtitle="Selamat datang di portal mahasiswa KIP TALKS">
     </x-page-header>
 
     <div class="row">

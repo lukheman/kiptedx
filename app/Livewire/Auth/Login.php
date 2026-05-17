@@ -4,13 +4,12 @@ namespace App\Livewire\Auth;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Attributes\Rule;
-
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.guest')]
-#[Title('Login - KIPTEDX')]
+#[Title('Login - KIP TALKS')]
 class Login extends Component
 {
     #[Rule(['required', 'email'])]
@@ -27,6 +26,7 @@ class Login extends Component
 
         if (Auth::attempt($credentials, $this->remember)) {
             session()->regenerate();
+
             return redirect()->to(route('dashboard'));
         }
 
