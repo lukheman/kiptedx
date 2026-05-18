@@ -48,6 +48,23 @@ class PresentasiPublic extends Component
             ->orderBy('urutan_tampil')
             ->get(['id', 'urutan_tampil', 'nama']);
 
+        // Get juri scoring details for current mahasiswa
+        $juriCount = \App\Models\Juri::count();
+        $juriScoringDetails = [];
+        if ($isActive && $setting->current_mahasiswa_id) {
+            $allJuri = \App\Models\Juri::all(['id', 'nama']);
+            $scoredJuriIds = \App\Models\Nilai::where('mahasiswa_id', $setting->current_mahasiswa_id)->pluck('juri_id')->toArray();
+            foreach ($allJuri as $j) {
+                $juriScoringDetails[] = [
+                    'id' => $j->id,
+                    'nama' => $j->nama,
+                    'scored' => in_array($j->id, $scoredJuriIds),
+                ];
+            }
+        }
+
+        $allScoredAt = $setting->all_scored_at ? $setting->all_scored_at->timestamp : null;
+
         return view('livewire.guest.presentasi-public', [
             'isActive' => $isActive,
             'isPaused' => $isPaused,
@@ -59,6 +76,9 @@ class PresentasiPublic extends Component
             'timerRemaining' => $setting->timer_remaining,
             'mahasiswaList' => $mahasiswaList,
             'currentMahasiswaId' => $setting->current_mahasiswa_id,
+            'juriCount' => $juriCount,
+            'juriScoringDetails' => $juriScoringDetails,
+            'allScoredAt' => $allScoredAt,
         ])->layoutData(['type' => 'presentasi']);
     }
 }

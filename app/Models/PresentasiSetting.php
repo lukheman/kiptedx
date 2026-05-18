@@ -13,6 +13,7 @@ class PresentasiSetting extends Model
         'timer_started_at',
         'timer_remaining',
         'current_slide_index',
+        'all_scored_at',
     ];
 
     protected function casts(): array
@@ -22,6 +23,7 @@ class PresentasiSetting extends Model
             'is_paused' => 'boolean',
             'timer_started_at' => 'datetime',
             'current_slide_index' => 'integer',
+            'all_scored_at' => 'datetime',
         ];
     }
 

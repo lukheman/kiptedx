@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('slide_presentasis', function (Blueprint $table) {
-            $table->dropColumn('judul_slide');
+        Schema::table('presentasi_settings', function (Blueprint $table) {
+            $table->timestamp('all_scored_at')->nullable()->after('current_slide_index');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('slide_presentasis', function (Blueprint $table) {
-            $table->string('judul_slide')->nullable()->after('urutan');
+        Schema::table('presentasi_settings', function (Blueprint $table) {
+            $table->dropColumn('all_scored_at');
         });
     }
 };

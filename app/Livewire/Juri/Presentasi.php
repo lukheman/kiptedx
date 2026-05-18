@@ -109,6 +109,23 @@ class Presentasi extends Component
             ->orderBy('urutan_tampil')
             ->get(['id', 'urutan_tampil', 'nama']);
 
+        // Get juri scoring details for current mahasiswa
+        $juriCount = \App\Models\Juri::count();
+        $juriScoringDetails = [];
+        if ($isActive && $setting->current_mahasiswa_id) {
+            $allJuri = \App\Models\Juri::all(['id', 'nama']);
+            $scoredJuriIds = Nilai::where('mahasiswa_id', $setting->current_mahasiswa_id)->pluck('juri_id')->toArray();
+            foreach ($allJuri as $j) {
+                $juriScoringDetails[] = [
+                    'id' => $j->id,
+                    'nama' => $j->nama,
+                    'scored' => in_array($j->id, $scoredJuriIds),
+                ];
+            }
+        }
+
+        $allScoredAt = $setting->all_scored_at ? $setting->all_scored_at->timestamp : null;
+
         $juriId = Auth::guard('juri')->id();
         $scoredIds = Nilai::where('juri_id', $juriId)->pluck('mahasiswa_id')->toArray();
 
@@ -124,6 +141,9 @@ class Presentasi extends Component
             'mahasiswaList' => $mahasiswaList,
             'scoredIds' => $scoredIds,
             'currentMahasiswaId' => $setting->current_mahasiswa_id,
+            'juriCount' => $juriCount,
+            'juriScoringDetails' => $juriScoringDetails,
+            'allScoredAt' => $allScoredAt,
         ]);
     }
 }

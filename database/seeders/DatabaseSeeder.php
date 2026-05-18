@@ -28,5 +28,17 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password123'),
         ]);
 
+        Juri::create([
+            'nim' => '242221121',
+            'nama' => 'Juri 2',
+            'password' => bcrypt('password123'),
+        ]);
+
+        Juri::create([
+            'nim' => '242221122',
+            'nama' => 'Juri 3',
+            'password' => bcrypt('password123'),
+        ]);
+
     }
 }

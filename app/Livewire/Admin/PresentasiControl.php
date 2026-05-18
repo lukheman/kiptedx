@@ -62,7 +62,16 @@ class PresentasiControl extends Component
             $allScored = $juriCount > 0 && $scoredCount >= $juriCount;
 
             if ($timerExpired && $allScored) {
-                $this->autoAdvance();
+                // Set all_scored_at jika belum di-set
+                if (! $setting->all_scored_at) {
+                    $setting->update(['all_scored_at' => now()]);
+                } else {
+                    // Auto-advance setelah 5 detik dari all_scored_at
+                    $secondsSinceAllScored = now()->timestamp - $setting->all_scored_at->timestamp;
+                    if ($secondsSinceAllScored >= 5) {
+                        $this->autoAdvance();
+                    }
+                }
             }
         }
     }
@@ -114,6 +123,7 @@ class PresentasiControl extends Component
                 'current_mahasiswa_id' => $next['id'],
                 'timer_started_at' => now(),
                 'current_slide_index' => 0,
+                'all_scored_at' => null,
             ]);
             $this->currentMahasiswaId = $next['id'];
             $this->currentSlideIndex = 0;
@@ -125,6 +135,7 @@ class PresentasiControl extends Component
                 'current_mahasiswa_id' => null,
                 'timer_started_at' => null,
                 'current_slide_index' => 0,
+                'all_scored_at' => null,
             ]);
             $this->isActive = false;
             $this->currentMahasiswaId = null;
@@ -148,6 +159,7 @@ class PresentasiControl extends Component
             'current_mahasiswa_id' => $firstMhs['id'],
             'timer_started_at' => now(),
             'current_slide_index' => 0,
+            'all_scored_at' => null,
         ]);
 
         $this->loadState();
@@ -162,6 +174,7 @@ class PresentasiControl extends Component
             'current_mahasiswa_id' => null,
             'timer_started_at' => null,
             'current_slide_index' => 0,
+            'all_scored_at' => null,
         ]);
 
         $this->loadState();
@@ -175,6 +188,7 @@ class PresentasiControl extends Component
             'current_mahasiswa_id' => $mahasiswaId,
             'timer_started_at' => now(),
             'current_slide_index' => 0,
+            'all_scored_at' => null,
         ]);
 
         $this->loadState();

@@ -70,53 +70,70 @@
         </div>
     @else
         {{-- Top Bar: Presenter Info + Timer --}}
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                @if ($currentMahasiswa->hasAvatar())
-                    <img src="{{ $currentMahasiswa->avatarUrl() }}" alt="Foto" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color);">
-                @else
-                    <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; border: 3px solid var(--border-color);">
-                        {{ $currentMahasiswa->urutan_tampil }}
-                    </div>
-                @endif
-                <div>
-                    <h4 class="mb-1" style="color: var(--text-primary); font-weight: 700;">
-                        @if (!$currentMahasiswa->hasAvatar())
-                            <span class="badge bg-danger me-2" style="font-size: 0.8rem;">{{ $currentMahasiswa->urutan_tampil }}</span>
-                        @endif
-                        {{ $currentMahasiswa->nama }}
-                    </h4>
-                <small class="text-muted">
-                    NIM: {{ $currentMahasiswa->nim }}
-                    @if ($currentMahasiswa->tema)
-                        &middot; Tema: <strong>{{ $currentMahasiswa->tema->judul }}</strong>
-                    @endif
-                </small>
-            </div>
-
-            {{-- Server-synced Timer: wire:key forces Alpine re-init when presenter changes --}}
-            <div wire:key="timer-{{ $timerStartedAt }}"
-                x-data="{
-                    startedAt: {{ $timerStartedAt ?? 'null' }},
-                    duration: {{ $timerDuration }},
-                    timeLeft: 0,
-                    interval: null,
-                    get formattedTime() {
-                        const m = Math.floor(this.timeLeft / 60);
-                        const s = this.timeLeft % 60;
-                        return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-                    },
-                    calcTime() {
-                        if (!this.startedAt) { this.timeLeft = this.duration; return; }
+        <div wire:key="presenter-juri-{{ $currentMahasiswaId }}"
+            x-data="{
+                startedAt: {{ $timerStartedAt ?? 'null' }},
+                duration: {{ $timerDuration }},
+                timeLeft: 0,
+                interval: null,
+                allScoredAt: {{ $allScoredAt ?? 'null' }},
+                countdown: 5,
+                countdownInterval: null,
+                get timerExpired() { return this.timeLeft <= 0 && this.startedAt !== null; },
+                get formattedTime() {
+                    const m = Math.floor(this.timeLeft / 60);
+                    const s = this.timeLeft % 60;
+                    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                },
+                calcTime() {
+                    if (!this.startedAt) { this.timeLeft = this.duration; return; }
+                    const now = Math.floor(Date.now() / 1000);
+                    const elapsed = now - this.startedAt;
+                    this.timeLeft = Math.max(0, this.duration - elapsed);
+                },
+                startCountdown() {
+                    if (this.allScoredAt && !this.countdownInterval) {
                         const now = Math.floor(Date.now() / 1000);
-                        const elapsed = now - this.startedAt;
-                        this.timeLeft = Math.max(0, this.duration - elapsed);
-                    },
-                    init() {
-                        this.calcTime();
-                        this.interval = setInterval(() => { this.calcTime(); }, 1000);
+                        const elapsed = now - this.allScoredAt;
+                        this.countdown = Math.max(0, 5 - elapsed);
+                        this.countdownInterval = setInterval(() => {
+                            this.countdown = Math.max(0, this.countdown - 1);
+                            if (this.countdown <= 0) clearInterval(this.countdownInterval);
+                        }, 1000);
                     }
-                }" x-init="init()">
+                },
+                init() {
+                    this.calcTime();
+                    this.interval = setInterval(() => { this.calcTime(); }, 1000);
+                    if (this.allScoredAt) this.startCountdown();
+                }
+            }" x-init="init()">
+
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    @if ($currentMahasiswa->hasAvatar())
+                        <img src="{{ $currentMahasiswa->avatarUrl() }}" alt="Foto" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color);">
+                    @else
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; border: 3px solid var(--border-color);">
+                            {{ $currentMahasiswa->urutan_tampil }}
+                        </div>
+                    @endif
+                    <div>
+                        <h4 class="mb-1" style="color: var(--text-primary); font-weight: 700;">
+                            @if (!$currentMahasiswa->hasAvatar())
+                                <span class="badge bg-danger me-2" style="font-size: 0.8rem;">{{ $currentMahasiswa->urutan_tampil }}</span>
+                            @endif
+                            {{ $currentMahasiswa->nama }}
+                        </h4>
+                    <small class="text-muted">
+                        NIM: {{ $currentMahasiswa->nim }}
+                        @if ($currentMahasiswa->tema)
+                            &middot; Tema: <strong>{{ $currentMahasiswa->tema->judul }}</strong>
+                        @endif
+                    </small>
+                </div>
+
+                {{-- Timer --}}
                 <div class="modern-card py-2 px-4 text-center mb-0" style="min-width: 150px;"
                     :style="timeLeft <= 10 ? 'border-color: var(--primary-color);' : ''">
                     <small class="text-muted d-block" style="font-size: 0.7rem;">SISA WAKTU</small>
@@ -126,84 +143,135 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Navigator Pills --}}
-        <div class="d-flex flex-wrap gap-2 mb-4">
-            @foreach ($mahasiswaList as $mhs)
-                @php
-                    $isCurrent = $mhs->id == $currentMahasiswaId;
-                    $isScored = in_array($mhs->id, $scoredIds);
-                @endphp
-                <div class="btn btn-sm {{ $isCurrent ? 'btn-danger' : ($isScored ? 'btn-success' : 'btn-outline-secondary') }}"
-                    style="font-size: 0.75rem; min-width: 36px; cursor: default;">
-                    {{ $mhs->urutan_tampil }}
-                </div>
-            @endforeach
-        </div>
-
-        <div class="row">
-            {{-- Slide Viewer --}}
-            <div class="col-12 col-lg-8 mb-4">
-                <div class="modern-card" style="padding: 0; overflow: hidden;">
-                    @if (count($slides) > 0)
-                        <div style="background: #000; min-height: 400px; display: flex; align-items: center; justify-content: center; position: relative;">
-                            <img src="{{ Storage::url($slides[$currentSlideIndex]['file_gambar']) }}"
-                                alt="Slide {{ $currentSlideIndex + 1 }}"
-                                style="max-width: 100%; max-height: 500px; object-fit: contain;">
-
-                        </div>
-                    @else
-                        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
-                            <div class="text-center text-muted">
-                                <i class="fas fa-image mb-3" style="font-size: 3rem;"></i>
-                                <p class="mb-0">Mahasiswa ini belum memiliki slide presentasi.</p>
-                            </div>
-                        </div>
-                    @endif
-                </div>
+            {{-- Navigator Pills --}}
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                @foreach ($mahasiswaList as $mhs)
+                    @php
+                        $isCurrent = $mhs->id == $currentMahasiswaId;
+                        $isScored = in_array($mhs->id, $scoredIds);
+                    @endphp
+                    <div class="btn btn-sm {{ $isCurrent ? 'btn-danger' : ($isScored ? 'btn-success' : 'btn-outline-secondary') }}"
+                        style="font-size: 0.75rem; min-width: 36px; cursor: default;">
+                        {{ $mhs->urutan_tampil }}
+                    </div>
+                @endforeach
             </div>
 
-            {{-- Scoring Panel --}}
-            <div class="col-12 col-lg-4 mb-4">
-                <div class="modern-card">
-                    <h5 class="mb-4" style="color: var(--text-primary); font-weight: 600;">
-                        <i class="fas fa-star me-2" style="color: #ffc107;"></i>Penilaian
-                    </h5>
+            <div class="row">
+                {{-- Slide Viewer --}}
+                <div class="col-12 col-lg-8 mb-4">
+                    {{-- Normal Slide View --}}
+                    <div x-show="!timerExpired" class="modern-card" style="padding: 0; overflow: hidden;">
+                        @if (count($slides) > 0)
+                            <div style="background: #000; min-height: 400px; display: flex; align-items: center; justify-content: center; position: relative;">
+                                <img src="{{ Storage::url($slides[$currentSlideIndex]['file_gambar']) }}"
+                                    alt="Slide {{ $currentSlideIndex + 1 }}"
+                                    style="max-width: 100%; max-height: 500px; object-fit: contain;">
+                            </div>
+                        @else
+                            <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image mb-3" style="font-size: 3rem;"></i>
+                                    <p class="mb-0">Mahasiswa ini belum memiliki slide presentasi.</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
 
-                    @if (session('success_nilai'))
-                        <x-alert variant="success" class="py-2 mb-3">{{ session('success_nilai') }}</x-alert>
-                    @endif
+                    {{-- Scoring Panel Overlay (shown when timer expires) --}}
+                    <div x-show="timerExpired" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100"
+                        class="modern-card" style="padding: 0; overflow: hidden; border: 2px solid var(--primary-color); min-height: 400px;">
 
-                    @if ($alreadyScored)
-                        <div class="alert border-0 mb-3" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
-                            <i class="fas fa-check-circle me-2"></i>Sudah dinilai. Anda dapat memperbarui nilai.
+                        <div class="text-center py-5 px-4">
+                            <div class="mb-3">
+                                <i class="fas fa-clipboard-check" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            </div>
+                            <h3 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.5rem;">Waktu Presentasi Selesai</h3>
+                            <p class="text-muted mb-4">Menunggu penilaian dari seluruh dewan juri...</p>
+
+                            {{-- Juri Scoring List --}}
+                            <div style="max-width: 500px; margin: 0 auto;">
+                                @foreach ($juriScoringDetails as $juri)
+                                    <div class="d-flex align-items-center justify-content-between px-4 py-3 mb-2 rounded"
+                                        style="background: var(--bg-light); border: 1px solid var(--border-color);">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div style="width: 40px; height: 40px; border-radius: 50%;
+                                                background: {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }};
+                                                color: white; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                                                @if ($juri['scored'])
+                                                    <i class="fas fa-check"></i>
+                                                @else
+                                                    <i class="fas fa-hourglass-half" style="color: var(--text-muted);"></i>
+                                                @endif
+                                            </div>
+                                            <span style="font-weight: 600; color: var(--text-primary);">{{ $juri['nama'] }}</span>
+                                        </div>
+                                        <span class="badge {{ $juri['scored'] ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.8rem;">
+                                            {{ $juri['scored'] ? 'Sudah Menilai' : 'Menunggu...' }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Countdown when all scored --}}
+                            @if ($allScoredAt)
+                                <div class="mt-4 pt-4" style="border-top: 1px solid var(--border-color);">
+                                    <p style="color: #28a745; font-weight: 600; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-check-circle me-2"></i>Semua juri telah memberikan nilai!
+                                    </p>
+                                    <div style="font-size: 3rem; font-weight: 800; color: var(--primary-color); font-family: monospace;">
+                                        <span x-text="countdown"></span>
+                                    </div>
+                                    <p class="text-muted" style="font-size: 0.9rem;">Peserta selanjutnya dalam <span x-text="countdown"></span> detik...</p>
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
+                </div>
 
-                    <form wire:submit.prevent="submitNilai">
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Nilai (1 - 100)</label>
-                            <input type="number" class="form-control form-control-lg text-center @error('nilai') is-invalid @enderror"
-                                wire:model="nilai" min="1" max="100" placeholder="0"
-                                style="font-size: 2rem; font-weight: 800; letter-spacing: 2px;">
-                            @error('nilai') <span class="text-danger small">{{ $message }}</span> @enderror
-                        </div>
+                {{-- Scoring Panel --}}
+                <div class="col-12 col-lg-4 mb-4">
+                    <div class="modern-card">
+                        <h5 class="mb-4" style="color: var(--text-primary); font-weight: 600;">
+                            <i class="fas fa-star me-2" style="color: #ffc107;"></i>Penilaian
+                        </h5>
 
-                        <div class="mb-4">
-                            <label class="form-label text-muted">Catatan (opsional)</label>
-                            <textarea class="form-control" wire:model="catatan" rows="3" placeholder="Catatan untuk mahasiswa..."></textarea>
-                        </div>
+                        @if (session('success_nilai'))
+                            <x-alert variant="success" class="py-2 mb-3">{{ session('success_nilai') }}</x-alert>
+                        @endif
 
-                        <button type="submit" class="btn btn-primary w-100" wire:loading.attr="disabled" wire:target="submitNilai">
-                            <span wire:loading.remove wire:target="submitNilai">
-                                <i class="fas fa-check me-2"></i>{{ $alreadyScored ? 'Perbarui Nilai' : 'Simpan Nilai' }}
-                            </span>
-                            <span wire:loading wire:target="submitNilai">
-                                <i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...
-                            </span>
-                        </button>
-                    </form>
+                        @if ($alreadyScored)
+                            <div class="alert border-0 mb-3" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
+                                <i class="fas fa-check-circle me-2"></i>Sudah dinilai. Anda dapat memperbarui nilai.
+                            </div>
+                        @endif
+
+                        <form wire:submit.prevent="submitNilai">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Nilai (1 - 100)</label>
+                                <input type="number" class="form-control form-control-lg text-center @error('nilai') is-invalid @enderror"
+                                    wire:model="nilai" min="1" max="100" placeholder="0"
+                                    style="font-size: 2rem; font-weight: 800; letter-spacing: 2px;">
+                                @error('nilai') <span class="text-danger small">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label text-muted">Catatan (opsional)</label>
+                                <textarea class="form-control" wire:model="catatan" rows="3" placeholder="Catatan untuk mahasiswa..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100" wire:loading.attr="disabled" wire:target="submitNilai">
+                                <span wire:loading.remove wire:target="submitNilai">
+                                    <i class="fas fa-check me-2"></i>{{ $alreadyScored ? 'Perbarui Nilai' : 'Simpan Nilai' }}
+                                </span>
+                                <span wire:loading wire:target="submitNilai">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...
+                                </span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
