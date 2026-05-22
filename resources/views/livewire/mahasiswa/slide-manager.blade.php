@@ -60,7 +60,7 @@
                 <div class="modern-card h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0" style="color: var(--text-primary);">Slide #{{ $i }}</h5>
-                        @if ($existing_slides[$i])
+                        @if ($existing_slides[$i] ?? null)
                             <span class="badge bg-success">Tersimpan</span>
                         @else
                             <span class="badge bg-secondary">Kosong</span>
@@ -73,7 +73,7 @@
                         </x-alert>
                     @endif
 
-                    @if ($existing_slides[$i])
+                    @if ($existing_slides[$i] ?? null)
                         <!-- Show existing slide -->
                         <div class="mb-3 text-center">
                             <img src="{{ Storage::url($existing_slides[$i]->file_gambar) }}" alt="Slide {{ $i }}" class="img-fluid rounded border" style="max-height: 200px; object-fit: cover;">

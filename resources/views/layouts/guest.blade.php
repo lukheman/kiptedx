@@ -68,6 +68,15 @@
         }
 
         /* ===== NAVBAR (shared across all pages) ===== */
+        .navbar-hover-trigger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            z-index: 1001;
+        }
+
         .site-navbar {
             position: fixed;
             top: 0;
@@ -77,7 +86,13 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
-            transition: all 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-100%);
+        }
+
+        .navbar-hover-trigger:hover + .site-navbar,
+        .site-navbar:hover {
+            transform: translateY(0);
         }
 
         [data-theme="dark"] .site-navbar {
@@ -137,11 +152,11 @@
         .btn-nav {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            gap: 6px;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             text-decoration: none;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -194,9 +209,9 @@
             font-size: 1.25rem;
         }
 
-        /* Mobile Menu */
+        /* Mobile Menu (Default Mobile) */
         .mobile-menu-btn {
-            display: none;
+            display: block;
             background: transparent;
             border: none;
             color: var(--text-primary);
@@ -204,17 +219,24 @@
             cursor: pointer;
         }
 
-        @media (max-width: 768px) {
-            .site-nav {
-                display: none;
-            }
+        .site-nav {
+            display: none;
+        }
 
+        @media (min-width: 768px) {
             .mobile-menu-btn {
-                display: block;
+                display: none;
             }
 
-            .site-navbar-actions .btn-nav-outline {
-                display: none;
+            .site-nav {
+                display: flex;
+            }
+
+            .btn-nav {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.95rem;
+                gap: 8px;
+                border-radius: 10px;
             }
         }
 
@@ -279,8 +301,7 @@
 
         .footer-container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            flex-direction: column;
             gap: 2rem;
         }
 
@@ -296,7 +317,8 @@
 
         .footer-links {
             display: flex;
-            gap: 4rem;
+            flex-direction: column;
+            gap: 2rem;
         }
 
         .footer-column h4 {
@@ -328,9 +350,9 @@
             padding-top: 2rem;
             border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            text-align: center;
             align-items: center;
-            flex-wrap: wrap;
             gap: 1rem;
         }
 
@@ -362,31 +384,34 @@
             color: white;
         }
 
-        @media (max-width: 768px) {
+        @media (min-width: 768px) {
             .footer-container {
-                flex-direction: column;
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
             }
 
             .footer-links {
-                flex-direction: column;
-                gap: 2rem;
+                flex-direction: row;
+                gap: 4rem;
             }
 
             .footer-bottom {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
             }
         }
 
         /* ===== AUTH PAGE STYLES ===== */
         .auth-section {
-            min-height: calc(100vh - 73px);
-            margin-top: 73px;
+            min-height: 100vh;
+            margin-top: 0;
             background: linear-gradient(135deg, #000000 0%, #111111 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 3rem 2rem;
+            padding: 2rem 1rem;
             position: relative;
             overflow: hidden;
         }
@@ -455,11 +480,17 @@
         .login-card {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            padding: 2rem 1.5rem;
             border: 1px solid rgba(229, 231, 235, 0.5);
             animation: slideUp 0.6s ease-out;
+        }
+
+        [data-theme="dark"] .login-card {
+            background: rgba(17, 17, 17, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         @keyframes slideUp {
@@ -479,15 +510,15 @@
         }
 
         .brand-logo .icon-wrapper {
-            width: 80px;
-            height: 80px;
+            width: 64px;
+            height: 64px;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            border-radius: 20px;
+            border-radius: 16px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1rem;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
             animation: pulse 2s infinite;
         }
 
@@ -501,12 +532,12 @@
         }
 
         .brand-logo .icon-wrapper i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: white;
         }
 
         .brand-logo h1 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
@@ -528,13 +559,14 @@
             padding: 1rem 1rem 1rem 3rem;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: #f9f9f9;
+            background: var(--bg-light);
+            color: var(--text-primary);
         }
 
         .form-floating .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 4px rgba(230, 43, 30, 0.1);
-            background: #ffffff;
+            background: var(--bg-white);
         }
 
         .form-floating label {
@@ -677,6 +709,7 @@
 
         .social-login {
             display: flex;
+            flex-direction: column;
             gap: 1rem;
         }
 
@@ -733,36 +766,53 @@
         }
 
         /* Auth responsive adjustments */
-        @media (max-width: 576px) {
+        @media (min-width: 576px) {
+            .auth-section {
+                padding: 3rem 2rem;
+            }
+
             .login-card {
-                padding: 2rem 1.5rem;
+                padding: 3rem;
+                border-radius: 24px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             }
 
             .brand-logo .icon-wrapper {
-                width: 64px;
-                height: 64px;
+                width: 80px;
+                height: 80px;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
             }
 
             .brand-logo .icon-wrapper i {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
 
             .brand-logo h1 {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
             }
 
             .social-login {
-                flex-direction: column;
+                flex-direction: row;
             }
         }
 
         /* Input autofill styling */
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0px 1000px #f8fafc inset;
-            -webkit-text-fill-color: var(--text-primary);
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--bg-light) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
             transition: background-color 5000s ease-in-out 0s;
+        }
+
+        [data-theme="dark"] input:-webkit-autofill,
+        [data-theme="dark"] input:-webkit-autofill:hover,
+        [data-theme="dark"] input:-webkit-autofill:focus,
+        [data-theme="dark"] input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--bg-light) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
         }
     </style>
     {{ $styles ?? '' }}
@@ -771,6 +821,9 @@
 <body>
     {{-- Navbar (hidden on presentasi fullscreen layout) --}}
     @if($type !== 'presentasi')
+        <!-- Invisible trigger zone at the top of the screen -->
+        <div class="navbar-hover-trigger"></div>
+        
         <nav class="site-navbar">
         <div class="site-navbar-container">
             <a href="/" class="site-brand">
@@ -789,7 +842,6 @@
                     <i class="fas fa-moon" id="theme-icon"></i>
                 </button>
                 <a href="{{ route('login') }}" class="btn-nav btn-nav-outline">Sign In</a>
-                <a href="{{ route('register') }}" class="btn-nav btn-nav-primary">Get Started</a>
                 <button class="mobile-menu-btn">
                     <i class="fas fa-bars"></i>
                 </button>

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Backsound;
 use App\Models\Juri;
 use App\Models\Mahasiswa;
 use App\Models\Nilai;
@@ -16,6 +17,8 @@ class PresentasiControl extends Component
     public $isActive = false;
 
     public $isPaused = false;
+
+    public $phase = 'idle';
 
     public $currentMahasiswaId = null;
 
@@ -35,13 +38,16 @@ class PresentasiControl extends Component
             ->toArray();
     }
 
-    public const TIMER_DURATION = 20; // detik (ubah ke 180 untuk produksi)
+    public const TIMER_DURATION = 300; // 5 menit (300 detik)
+
+    public const COUNTDOWN_DURATION = 300; // 5 menit countdown awal
 
     public function loadState()
     {
         $setting = PresentasiSetting::instance();
         $this->isActive = $setting->is_active;
         $this->isPaused = $setting->is_paused;
+        $this->phase = $setting->phase ?? 'idle';
         $this->currentMahasiswaId = $setting->current_mahasiswa_id;
         $this->currentSlideIndex = $setting->current_slide_index ?? 0;
 
@@ -50,29 +56,6 @@ class PresentasiControl extends Component
             $this->slidesCount = SlidePresentasi::where('mahasiswa_id', $this->currentMahasiswaId)->count();
         } else {
             $this->slidesCount = 0;
-        }
-
-        // Auto-advance: jika aktif, TIDAK dijeda, timer habis, dan semua juri sudah menilai
-        if ($this->isActive && ! $this->isPaused && $this->currentMahasiswaId && $setting->timer_started_at) {
-            $elapsed = now()->timestamp - $setting->timer_started_at->timestamp;
-            $timerExpired = $elapsed >= self::TIMER_DURATION;
-
-            $juriCount = Juri::count();
-            $scoredCount = Nilai::where('mahasiswa_id', $this->currentMahasiswaId)->count();
-            $allScored = $juriCount > 0 && $scoredCount >= $juriCount;
-
-            if ($timerExpired && $allScored) {
-                // Set all_scored_at jika belum di-set
-                if (! $setting->all_scored_at) {
-                    $setting->update(['all_scored_at' => now()]);
-                } else {
-                    // Auto-advance setelah 5 detik dari all_scored_at
-                    $secondsSinceAllScored = now()->timestamp - $setting->all_scored_at->timestamp;
-                    if ($secondsSinceAllScored >= 5) {
-                        $this->autoAdvance();
-                    }
-                }
-            }
         }
     }
 
@@ -113,36 +96,10 @@ class PresentasiControl extends Component
         session()->flash('success', 'Presentasi dilanjutkan.');
     }
 
-    protected function autoAdvance()
-    {
-        $currentIndex = $this->getCurrentIndex();
-        if ($currentIndex !== null && $currentIndex < count($this->mahasiswaList) - 1) {
-            $next = $this->mahasiswaList[$currentIndex + 1];
-            $setting = PresentasiSetting::instance();
-            $setting->update([
-                'current_mahasiswa_id' => $next['id'],
-                'timer_started_at' => now(),
-                'current_slide_index' => 0,
-                'all_scored_at' => null,
-            ]);
-            $this->currentMahasiswaId = $next['id'];
-            $this->currentSlideIndex = 0;
-        } else {
-            // Semua mahasiswa sudah selesai
-            $setting = PresentasiSetting::instance();
-            $setting->update([
-                'is_active' => false,
-                'current_mahasiswa_id' => null,
-                'timer_started_at' => null,
-                'current_slide_index' => 0,
-                'all_scored_at' => null,
-            ]);
-            $this->isActive = false;
-            $this->currentMahasiswaId = null;
-            $this->currentSlideIndex = 0;
-        }
-    }
-
+    /**
+     * Step 1: Admin starts the presentation session
+     * Goes to COUNTDOWN phase (5 min countdown before anything starts)
+     */
     public function startPresentasi()
     {
         if (count($this->mahasiswaList) === 0) {
@@ -156,14 +113,91 @@ class PresentasiControl extends Component
         $setting = PresentasiSetting::instance();
         $setting->update([
             'is_active' => true,
+            'is_paused' => false,
+            'phase' => PresentasiSetting::PHASE_COUNTDOWN,
             'current_mahasiswa_id' => $firstMhs['id'],
-            'timer_started_at' => now(),
+            'timer_started_at' => null,
             'current_slide_index' => 0,
             'all_scored_at' => null,
+            'countdown_started_at' => now(),
+        ]);
+
+        $this->loadState();
+        session()->flash('success', 'Countdown dimulai! Presentasi akan segera dimulai.');
+    }
+
+    /**
+     * Step 2: Admin skips countdown or countdown finishes
+     * Goes to INTRO phase (show presenter photo + topic)
+     */
+    public function goToIntro()
+    {
+        $setting = PresentasiSetting::instance();
+        $setting->update([
+            'phase' => PresentasiSetting::PHASE_INTRO,
+            'countdown_started_at' => null,
+        ]);
+
+        $this->loadState();
+        session()->flash('success', 'Memperkenalkan peserta...');
+    }
+
+    /**
+     * Step 3: Admin clicks "Mulai Presentasi" for current presenter
+     * Goes from INTRO to PRESENTING phase (show slides + timer)
+     */
+    public function startPresenting()
+    {
+        $setting = PresentasiSetting::instance();
+        $setting->update([
+            'phase' => PresentasiSetting::PHASE_PRESENTING,
+            'timer_started_at' => now(),
+            'current_slide_index' => 0,
         ]);
 
         $this->loadState();
         session()->flash('success', 'Presentasi dimulai!');
+    }
+
+    /**
+     * Step 4: Timer expires or admin ends presentation
+     * Goes to SCORING phase (show photo + wait for jury)
+     */
+    public function goToScoring()
+    {
+        $setting = PresentasiSetting::instance();
+        $setting->update([
+            'phase' => PresentasiSetting::PHASE_SCORING,
+            'timer_started_at' => null,
+            'all_scored_at' => null,
+        ]);
+
+        $this->loadState();
+        session()->flash('success', 'Menunggu penilaian juri...');
+    }
+
+    /**
+     * Step 5: Admin clicks "Lanjut" → next presenter intro or finish
+     */
+    public function nextMahasiswa()
+    {
+        $currentIndex = $this->getCurrentIndex();
+        if ($currentIndex !== null && $currentIndex < count($this->mahasiswaList) - 1) {
+            $next = $this->mahasiswaList[$currentIndex + 1];
+            $setting = PresentasiSetting::instance();
+            $setting->update([
+                'phase' => PresentasiSetting::PHASE_INTRO,
+                'current_mahasiswa_id' => $next['id'],
+                'timer_started_at' => null,
+                'current_slide_index' => 0,
+                'all_scored_at' => null,
+            ]);
+            $this->loadState();
+            session()->flash('success', 'Peserta selanjutnya!');
+        } else {
+            // All done
+            $this->stopPresentasi();
+        }
     }
 
     public function stopPresentasi()
@@ -171,10 +205,12 @@ class PresentasiControl extends Component
         $setting = PresentasiSetting::instance();
         $setting->update([
             'is_active' => false,
+            'phase' => PresentasiSetting::PHASE_IDLE,
             'current_mahasiswa_id' => null,
             'timer_started_at' => null,
             'current_slide_index' => 0,
             'all_scored_at' => null,
+            'countdown_started_at' => null,
         ]);
 
         $this->loadState();
@@ -185,22 +221,14 @@ class PresentasiControl extends Component
     {
         $setting = PresentasiSetting::instance();
         $setting->update([
+            'phase' => PresentasiSetting::PHASE_INTRO,
             'current_mahasiswa_id' => $mahasiswaId,
-            'timer_started_at' => now(),
+            'timer_started_at' => null,
             'current_slide_index' => 0,
             'all_scored_at' => null,
         ]);
 
         $this->loadState();
-    }
-
-    public function nextMahasiswa()
-    {
-        $currentIndex = $this->getCurrentIndex();
-        if ($currentIndex !== null && $currentIndex < count($this->mahasiswaList) - 1) {
-            $next = $this->mahasiswaList[$currentIndex + 1];
-            $this->goToMahasiswa($next['id']);
-        }
     }
 
     public function prevMahasiswa()
@@ -268,12 +296,76 @@ class PresentasiControl extends Component
                 ->toArray();
         }
 
+        $setting = PresentasiSetting::instance();
+        $countdownStartedAt = $setting->countdown_started_at ? $setting->countdown_started_at->timestamp : null;
+
+        // Juri scoring details for scoring phase
+        $juriScoringDetails = [];
+        if ($this->isActive && $this->currentMahasiswaId) {
+            $allJuri = Juri::all(['id', 'nama']);
+            $scoredJuriIds = Nilai::where('mahasiswa_id', $this->currentMahasiswaId)->pluck('juri_id')->toArray();
+            foreach ($allJuri as $j) {
+                $juriScoringDetails[] = [
+                    'id' => $j->id,
+                    'nama' => $j->nama,
+                    'scored' => in_array($j->id, $scoredJuriIds),
+                ];
+            }
+        }
+
+        $timerStartedAt = $setting->timer_started_at ? $setting->timer_started_at->timestamp : null;
+
+        // Backsound data
+        $backsounds = Backsound::orderBy('created_at', 'desc')->get();
+        $currentBacksoundId = $setting->current_backsound_id;
+        $musicPlaying = $setting->music_playing;
+        $currentBacksound = $currentBacksoundId ? Backsound::find($currentBacksoundId) : null;
+
         return view('livewire.admin.presentasi-control', [
             'currentIndex' => $currentIndex,
             'currentMhs' => $currentMhs,
             'juriCount' => $juriCount,
             'scoredStats' => $scoredStats,
             'slides' => $slides,
+            'countdownStartedAt' => $countdownStartedAt,
+            'timerStartedAt' => $timerStartedAt,
+            'juriScoringDetails' => $juriScoringDetails,
+            'backsounds' => $backsounds,
+            'currentBacksoundId' => $currentBacksoundId,
+            'musicPlaying' => $musicPlaying,
+            'currentBacksound' => $currentBacksound,
         ]);
+    }
+
+    // ========== Backsound Methods ==========
+
+    public function playBacksound($id)
+    {
+        $backsound = Backsound::find($id);
+        if (!$backsound) return;
+
+        $setting = PresentasiSetting::instance();
+        $setting->update([
+            'current_backsound_id' => $id,
+            'music_playing' => true,
+        ]);
+        $this->dispatch('backsound-play', ['url' => $backsound->audioUrl()]);
+    }
+
+    public function stopBacksound()
+    {
+        $setting = PresentasiSetting::instance();
+        $setting->update(['music_playing' => false]);
+        $this->dispatch('backsound-stop');
+    }
+
+    public function resumeBacksound()
+    {
+        $setting = PresentasiSetting::instance();
+        $backsound = $setting->current_backsound_id ? Backsound::find($setting->current_backsound_id) : null;
+        if ($backsound) {
+            $setting->update(['music_playing' => true]);
+            $this->dispatch('backsound-play', ['url' => $backsound->audioUrl()]);
+        }
     }
 }

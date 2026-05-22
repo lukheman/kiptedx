@@ -1,7 +1,7 @@
 <div>
     <!-- Image Banner Section -->
-    <section class="banner-section" style="width: 100vw; height: 100vh; margin-left: calc(-50vw + 50%); position: relative;">
-        <img src="{{ asset('img/landing.jpeg') }}" alt="UAS Kecerdasan Interpersonal" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+    <section class="banner-section">
+        <img src="{{ asset('img/landing.jpeg') }}" alt="UAS Kecerdasan Interpersonal" class="banner-img">
     </section>
 
     <!-- Hero Text Section -->
@@ -59,6 +59,24 @@
 
     <x-slot:styles>
         <style>
+            /* Banner Section */
+            .banner-section {
+                width: 100%;
+                background-color: var(--bg-light);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+            }
+
+            .banner-img {
+                width: 100%;
+                height: auto;
+                max-height: 100vh;
+                object-fit: contain;
+                display: block;
+            }
+
             /* Hero Section */
             .hero {
                 min-height: 100vh;
@@ -435,6 +453,8 @@
             /* Responsive */
             @media (max-width: 1024px) {
                 .about-grid {
+                    grid-template-columns: 1fr;
+                }
 
                 .about-image {
                     order: -1;

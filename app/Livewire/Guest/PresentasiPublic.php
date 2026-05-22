@@ -20,6 +20,7 @@ class PresentasiPublic extends Component
         $setting = PresentasiSetting::instance();
         $isActive = $setting->is_active;
         $isPaused = $setting->is_paused;
+        $phase = $setting->phase ?? 'idle';
         $currentMahasiswa = null;
         $slides = [];
 
@@ -43,6 +44,8 @@ class PresentasiPublic extends Component
 
         $timerStartedAt = $setting->timer_started_at ? $setting->timer_started_at->timestamp : null;
         $timerDuration = PresentasiControl::TIMER_DURATION;
+        $countdownStartedAt = $setting->countdown_started_at ? $setting->countdown_started_at->timestamp : null;
+        $countdownDuration = PresentasiControl::COUNTDOWN_DURATION;
 
         $mahasiswaList = Mahasiswa::whereNotNull('urutan_tampil')
             ->orderBy('urutan_tampil')
@@ -63,22 +66,35 @@ class PresentasiPublic extends Component
             }
         }
 
-        $allScoredAt = $setting->all_scored_at ? $setting->all_scored_at->timestamp : null;
+        // Backsound
+        $backsoundUrl = null;
+        $musicPlaying = $setting->music_playing;
+        $backsoundId = $setting->current_backsound_id;
+        if ($backsoundId) {
+            $backsound = \App\Models\Backsound::find($backsoundId);
+            if ($backsound) {
+                $backsoundUrl = $backsound->audioUrl();
+            }
+        }
 
         return view('livewire.guest.presentasi-public', [
             'isActive' => $isActive,
             'isPaused' => $isPaused,
+            'phase' => $phase,
             'currentMahasiswa' => $currentMahasiswa,
             'slides' => $slides,
             'currentSlideIndex' => $currentSlideIndex,
             'timerStartedAt' => $timerStartedAt,
             'timerDuration' => $timerDuration,
-            'timerRemaining' => $setting->timer_remaining,
+            'countdownStartedAt' => $countdownStartedAt,
+            'countdownDuration' => $countdownDuration,
             'mahasiswaList' => $mahasiswaList,
             'currentMahasiswaId' => $setting->current_mahasiswa_id,
             'juriCount' => $juriCount,
             'juriScoringDetails' => $juriScoringDetails,
-            'allScoredAt' => $allScoredAt,
+            'backsoundUrl' => $backsoundUrl,
+            'musicPlaying' => $musicPlaying,
+            'backsoundId' => $backsoundId,
         ])->layoutData(['type' => 'presentasi']);
     }
 }

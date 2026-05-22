@@ -77,6 +77,7 @@ class Presentasi extends Component
     {
         $setting = PresentasiSetting::instance();
         $isActive = $setting->is_active;
+        $phase = $setting->phase ?? 'idle';
         $currentMahasiswa = null;
         $slides = [];
 
@@ -103,6 +104,8 @@ class Presentasi extends Component
         // Pass timer_started_at as Unix timestamp for client-side calculation
         $timerStartedAt = $setting->timer_started_at ? $setting->timer_started_at->timestamp : null;
         $timerDuration = PresentasiControl::TIMER_DURATION;
+        $countdownStartedAt = $setting->countdown_started_at ? $setting->countdown_started_at->timestamp : null;
+        $countdownDuration = PresentasiControl::COUNTDOWN_DURATION;
 
         // Get ordered list for navigation pills
         $mahasiswaList = Mahasiswa::whereNotNull('urutan_tampil')
@@ -124,26 +127,26 @@ class Presentasi extends Component
             }
         }
 
-        $allScoredAt = $setting->all_scored_at ? $setting->all_scored_at->timestamp : null;
-
         $juriId = Auth::guard('juri')->id();
         $scoredIds = Nilai::where('juri_id', $juriId)->pluck('mahasiswa_id')->toArray();
 
         return view('livewire.juri.presentasi', [
             'isActive' => $isActive,
             'isPaused' => $setting->is_paused,
+            'phase' => $phase,
             'currentMahasiswa' => $currentMahasiswa,
             'slides' => $slides,
             'currentSlideIndex' => $currentSlideIndex,
             'timerStartedAt' => $timerStartedAt,
             'timerDuration' => $timerDuration,
             'timerRemaining' => $setting->timer_remaining,
+            'countdownStartedAt' => $countdownStartedAt,
+            'countdownDuration' => $countdownDuration,
             'mahasiswaList' => $mahasiswaList,
             'scoredIds' => $scoredIds,
             'currentMahasiswaId' => $setting->current_mahasiswa_id,
             'juriCount' => $juriCount,
             'juriScoringDetails' => $juriScoringDetails,
-            'allScoredAt' => $allScoredAt,
         ]);
     }
 }

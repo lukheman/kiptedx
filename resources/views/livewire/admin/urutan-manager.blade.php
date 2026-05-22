@@ -42,7 +42,7 @@
     {{-- Card Grid --}}
     <div class="row">
         @forelse ($mahasiswas as $index => $mhs)
-            <div class="col-6 col-md-4 col-lg-3 col-xl-2 mb-4" wire:key="urutan-{{ $mhs['id'] }}">
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2 mb-4" wire:key="urutan-{{ $mhs['id'] }}-{{ $mhs['urutan_tampil'] ?? 'none' }}-{{ $mhs['urutan_dikunci'] ? 'lock' : 'unlock' }}">
                 <div class="modern-card h-100 position-relative text-center p-3"
                     style="{{ $mhs['urutan_dikunci'] ? 'border-color: var(--primary-color); border-width: 2px;' : '' }}">
 
@@ -129,6 +129,7 @@
             <div class="d-flex flex-wrap gap-2">
                 @foreach ($ordered as $mhs)
                     <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
+                        wire:key="preview-{{ $mhs['id'] }}-{{ $mhs['urutan_tampil'] ?? 'none' }}"
                         style="background: {{ $mhs['urutan_dikunci'] ? 'rgba(230, 43, 30, 0.1)' : 'var(--hover-bg)' }};
                                border: 1px solid {{ $mhs['urutan_dikunci'] ? 'var(--primary-color)' : 'var(--border-color)' }};">
                         <span class="badge rounded-pill {{ $mhs['urutan_dikunci'] ? 'bg-danger' : 'bg-secondary' }}" style="font-size: 0.7rem;">
