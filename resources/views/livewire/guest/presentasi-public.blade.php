@@ -274,27 +274,33 @@
                             </div>
 
                             {{-- Juri Scoring List --}}
-                            @foreach ($juriScoringDetails as $juri)
-                                <div class="d-flex align-items-center justify-content-between px-4 py-3 mb-2 rounded-3"
-                                    style="background: var(--bg-light); border: 1px solid var(--border-color); transition: all 0.3s ease;">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div style="width: 44px; height: 44px; border-radius: 50%;
-                                            background: {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }};
-                                            color: white; display: flex; align-items: center; justify-content: center; font-size: 1rem;
-                                            transition: background 0.5s ease;">
-                                            @if ($juri['scored'])
-                                                <i class="fas fa-check"></i>
-                                            @else
-                                                <i class="fas fa-hourglass-half" style="color: var(--text-muted); animation: pulse-opacity 2s infinite;"></i>
-                                            @endif
+                            <div class="row g-3">
+                                @foreach ($juriScoringDetails as $juri)
+                                    <div class="col-4 col-md-4">
+                                        <div class="d-flex flex-column align-items-center justify-content-center p-3 rounded-3 h-100 text-center"
+                                            style="background: var(--bg-light); border: 2px solid {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }}; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                                            <div style="width: 50px; height: 50px; border-radius: 50%;
+                                                background: {{ $juri['scored'] ? '#28a745' : 'var(--bg-white)' }};
+                                                border: 2px solid {{ $juri['scored'] ? '#28a745' : 'var(--text-muted)' }};
+                                                color: {{ $juri['scored'] ? 'white' : 'var(--text-muted)' }};
+                                                display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+                                                transition: all 0.5s ease; margin-bottom: 0.75rem;">
+                                                @if ($juri['scored'])
+                                                    <i class="fas fa-check"></i>
+                                                @else
+                                                    <i class="fas fa-hourglass-half" style="animation: pulse-opacity 2s infinite;"></i>
+                                                @endif
+                                            </div>
+                                            <span style="font-weight: 700; color: var(--text-primary); font-size: 0.9rem; line-height: 1.2; margin-bottom: 0.5rem; display: block; word-wrap: break-word;">
+                                                {{ $juri['nama'] }}
+                                            </span>
+                                            <span class="badge {{ $juri['scored'] ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; letter-spacing: 0.5px;">
+                                                {{ $juri['scored'] ? 'Sudah Menilai' : 'Menunggu' }}
+                                            </span>
                                         </div>
-                                        <span style="font-weight: 600; color: var(--text-primary); font-size: 1.05rem;">{{ $juri['nama'] }}</span>
                                     </div>
-                                    <span class="badge {{ $juri['scored'] ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
-                                        {{ $juri['scored'] ? 'Sudah Menilai' : 'Menunggu...' }}
-                                    </span>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
 
                             {{-- All scored check --}}
                             @php

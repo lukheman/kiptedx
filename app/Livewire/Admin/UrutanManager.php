@@ -12,6 +12,8 @@ class UrutanManager extends Component
 {
     public $mahasiswas = [];
 
+    public array $urutanInputs = [];
+
     public function mount()
     {
         $this->loadMahasiswas();
@@ -19,10 +21,12 @@ class UrutanManager extends Component
 
     public function loadMahasiswas()
     {
+        $this->urutanInputs = [];
         $this->mahasiswas = Mahasiswa::orderByRaw('urutan_tampil IS NULL, urutan_tampil ASC')
             ->orderBy('nama')
             ->get()
             ->map(function ($mhs) {
+                $this->urutanInputs[$mhs->id] = $mhs->urutan_tampil;
                 return [
                     'id' => $mhs->id,
                     'nim' => $mhs->nim,
@@ -36,26 +40,26 @@ class UrutanManager extends Component
             ->toArray();
     }
 
-    public function updateUrutan($mahasiswaId, $urutan)
+    public function simpanUrutan()
     {
-        $urutan = $urutan !== '' ? (int) $urutan : null;
+        // validate uniqueness among the inputs
+        $values = array_filter($this->urutanInputs, fn($v) => $v !== null && $v !== '');
+        $counts = array_count_values($values);
+        $duplicates = array_filter($counts, fn($c) => $c > 1);
 
-        // Validate: urutan must be unique (if not null)
-        if ($urutan !== null) {
-            $existing = Mahasiswa::where('urutan_tampil', $urutan)
-                ->where('id', '!=', $mahasiswaId)
-                ->first();
-
-            if ($existing) {
-                session()->flash('error', "Urutan {$urutan} sudah digunakan oleh {$existing->nama}.");
-                $this->loadMahasiswas();
-
-                return;
-            }
+        if (!empty($duplicates)) {
+            $dupKeys = implode(', ', array_keys($duplicates));
+            session()->flash('error', "Terdapat urutan ganda pada angka: {$dupKeys}. Harap pastikan setiap urutan unik.");
+            return;
         }
 
-        Mahasiswa::where('id', $mahasiswaId)->update(['urutan_tampil' => $urutan]);
+        foreach ($this->urutanInputs as $id => $urutan) {
+            $val = ($urutan !== null && $urutan !== '') ? (int) $urutan : null;
+            Mahasiswa::where('id', $id)->update(['urutan_tampil' => $val]);
+        }
+
         $this->loadMahasiswas();
+        session()->flash('success', 'Urutan berhasil disimpan!');
     }
 
     public function toggleKunci($mahasiswaId)

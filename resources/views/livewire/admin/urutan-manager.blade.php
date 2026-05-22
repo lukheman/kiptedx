@@ -2,6 +2,9 @@
     <x-page-header title="Atur Urutan Tampil" subtitle="Kelola urutan tampil presentasi mahasiswa">
         <x-slot:actions>
             <div class="d-flex gap-2">
+                <x-button variant="success" icon="fas fa-save" wire:click="simpanUrutan">
+                    Simpan Urutan
+                </x-button>
                 <x-button variant="outline" icon="fas fa-undo" wire:click="resetUrutan"
                     onclick="confirm('Reset semua urutan yang tidak terkunci?') || event.stopImmediatePropagation()">
                     Reset
@@ -32,7 +35,7 @@
         <div>
             <strong>Panduan:</strong>
             <ul class="mb-0 mt-1 ps-3">
-                <li>Isi kolom <strong>Urutan</strong> secara manual untuk menentukan posisi tampil mahasiswa.</li>
+                <li>Isi kolom <strong>Urutan</strong> secara manual, lalu klik tombol <strong>Simpan Urutan</strong> untuk menyimpan perubahan.</li>
                 <li>Klik ikon <strong>gembok</strong> <i class="fas fa-lock"></i> untuk mengunci posisi. Mahasiswa yang terkunci <strong>tidak akan berubah</strong> saat urutan diacak.</li>
                 <li>Tekan tombol <strong>Acak Urutan</strong> untuk mengacak posisi mahasiswa yang <strong>tidak terkunci</strong>.</li>
             </ul>
@@ -88,9 +91,8 @@
                         <input type="number"
                             class="form-control form-control-sm text-center mx-auto"
                             style="width: 65px; {{ $mhs['urutan_dikunci'] ? 'border-color: var(--primary-color); font-weight: 700;' : '' }}"
-                            value="{{ $mhs['urutan_tampil'] }}"
+                            wire:model="urutanInputs.{{ $mhs['id'] }}"
                             min="1"
-                            wire:change="updateUrutan({{ $mhs['id'] }}, $event.target.value)"
                             {{ $mhs['urutan_dikunci'] ? 'readonly' : '' }}>
                     </div>
 

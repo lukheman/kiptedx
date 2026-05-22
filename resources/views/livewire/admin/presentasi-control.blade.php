@@ -63,109 +63,36 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-
-            {{-- Mahasiswa Order List --}}
-            <div class="modern-card">
-                <h5 class="mb-4" style="color: var(--text-primary); font-weight: 600;">
-                    <i class="fas fa-list-ol me-2"></i>Daftar Urutan Presentasi
-                </h5>
-
-                <div class="table-responsive">
-                    <table class="table table-modern align-middle">
-                        <thead>
-                            <tr>
-                                <th style="width: 70px;">Urutan</th>
-                                <th>Nama</th>
-                                <th>Tema</th>
-                                <th>Penilaian</th>
-                                <th style="width: 100px;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($mahasiswaList as $idx => $mhs)
-                                @php
-                                    $isCurrent = $isActive && $mhs['id'] == $currentMahasiswaId;
-                                    $scored = $scoredStats[$mhs['id']] ?? 0;
-                                @endphp
-                                <tr style="{{ $isCurrent ? 'background: rgba(230,43,30,0.06);' : '' }}">
-                                    <td>
-                                        <span class="badge {{ $isCurrent ? 'bg-danger' : 'bg-secondary' }}" style="font-size: 0.85rem;">
-                                            {{ $mhs['urutan_tampil'] }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            @if ($isCurrent)
-                                                <i class="fas fa-microphone-alt text-danger" style="font-size: 0.8rem;"></i>
-                                            @endif
-                                            <span class="fw-semibold" style="color: var(--text-primary);">{{ $mhs['nama'] }}</span>
-                                        </div>
-                                        <small class="text-muted">{{ $mhs['nim'] }}</small>
-                                    </td>
-                                    <td style="color: var(--text-secondary);">{{ $mhs['tema']['judul'] ?? '-' }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="progress" style="width: 60px; height: 6px; background: var(--hover-bg);">
-                                                <div class="progress-bar {{ $scored >= $juriCount && $juriCount > 0 ? 'bg-success' : 'bg-warning' }}"
-                                                    style="width: {{ $juriCount > 0 ? ($scored / $juriCount) * 100 : 0 }}%;"></div>
-                                            </div>
-                                            <small class="text-muted">{{ $scored }}/{{ $juriCount }}</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        @if ($isActive)
-                                            <button class="btn btn-sm {{ $isCurrent ? 'btn-danger' : 'btn-outline-secondary' }}"
-                                                wire:click="goToMahasiswa({{ $mhs['id'] }})"
-                                                {{ $isCurrent ? 'disabled' : '' }}>
-                                                @if ($isCurrent)
-                                                    <i class="fas fa-volume-up"></i>
-                                                @else
-                                                    <i class="fas fa-play"></i>
-                                                @endif
-                                            </button>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-
+    <div class="row g-4">
+        {{-- Left Column: MAIN CONTROLS --}}
+        <div class="col-12 col-lg-7 col-xl-8">
             {{-- Phase Control Panel --}}
             @if ($isActive && $currentMhs)
-                <div class="modern-card mb-4" style="border: 2px solid var(--primary-color);">
+                <div class="modern-card mb-4" style="border: 2px solid var(--primary-color); box-shadow: 0 10px 30px rgba(230,43,30,0.1);">
 
                     {{-- Current Presenter Info --}}
-                    <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-4 mb-4">
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 56px; height: 56px; background: var(--primary-color); color: white; font-size: 1.5rem; font-weight: 800; flex-shrink: 0;">
+                            style="width: 70px; height: 70px; background: var(--primary-color); color: white; font-size: 2rem; font-weight: 800; flex-shrink: 0; box-shadow: 0 5px 15px rgba(230,43,30,0.3);">
                             {{ $currentMhs['urutan_tampil'] }}
                         </div>
                         <div>
-                            <h5 class="mb-0" style="color: var(--text-primary); font-weight: 700;">{{ $currentMhs['nama'] }}</h5>
-                            <small class="text-muted">
+                            <h3 class="mb-1" style="color: var(--text-primary); font-weight: 800;">{{ $currentMhs['nama'] }}</h3>
+                            <p class="text-muted mb-0" style="font-size: 1.1rem;">
                                 NIM: {{ $currentMhs['nim'] }}
                                 @if (!empty($currentMhs['tema']))
-                                    &middot; {{ $currentMhs['tema']['judul'] }}
+                                    &middot; <span style="color: var(--primary-color); font-weight: 600;">{{ $currentMhs['tema']['judul'] }}</span>
                                 @endif
-                            </small>
+                            </p>
                         </div>
                     </div>
 
-                    <hr style="border-color: var(--border-color);">
+                    <hr style="border-color: var(--border-color); margin-bottom: 2rem;">
 
                     {{-- Phase-specific actions --}}
                     @if ($phase === 'countdown')
-                        <div class="text-center py-3">
-                            <div class="mb-3" x-data="{
+                        <div class="text-center py-4">
+                            <div class="mb-4" x-data="{
                                 started: {{ $countdownStartedAt ?? 'null' }},
                                 duration: {{ \App\Livewire\Admin\PresentasiControl::COUNTDOWN_DURATION }},
                                 timeLeft: 0,
@@ -187,118 +114,131 @@
                                 },
                                 init() { this.calc(); this.interval = setInterval(() => this.calc(), 1000); }
                             }">
-                                <small class="text-muted d-block mb-1">COUNTDOWN</small>
-                                <div style="font-size: 2rem; font-weight: 800; font-family: monospace; color: var(--primary-color);">
+                                <h5 class="text-muted d-block mb-2" style="font-weight: 600; letter-spacing: 2px;">COUNTDOWN</h5>
+                                <div style="font-size: 5rem; font-weight: 900; font-family: monospace; color: var(--primary-color); line-height: 1;">
                                     <span x-text="formatted"></span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary w-100" wire:click="goToIntro">
+                            <button class="btn btn-primary btn-lg w-100 py-3" style="font-size: 1.25rem; font-weight: 700;" wire:click="goToIntro">
                                 <i class="fas fa-forward me-2"></i>Skip Countdown
                             </button>
                         </div>
+
                     @elseif ($phase === 'intro')
-                        <div class="text-center py-3">
-                            <p class="text-muted mb-3">
-                                <i class="fas fa-user-circle me-1"></i>
-                                Peserta sedang diperkenalkan di layar publik
-                            </p>
-                            <button class="btn btn-primary btn-lg w-100" wire:click="startPresenting">
-                                <i class="fas fa-play me-2"></i>Mulai Presentasi
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-users" style="font-size: 4rem; color: #17a2b8;"></i>
+                            </div>
+                            <h4 class="mb-4" style="color: var(--text-primary);">Peserta sedang diperkenalkan di layar publik...</h4>
+                            <button class="btn btn-primary btn-lg w-100 py-3" style="font-size: 1.25rem; font-weight: 700;" wire:click="startPresenting">
+                                <i class="fas fa-play me-2"></i>Mulai Sesi Presentasi Sekarang
                             </button>
                         </div>
+
                     @elseif ($phase === 'presenting')
-                        {{-- Timer --}}
-                        <div class="text-center mb-3" x-data="{
-                            started: {{ $timerStartedAt ?? 'null' }},
-                            duration: {{ \App\Livewire\Admin\PresentasiControl::TIMER_DURATION }},
-                            timeLeft: 0,
-                            interval: null,
-                            get formatted() {
-                                const m = Math.floor(this.timeLeft / 60);
-                                const s = this.timeLeft % 60;
-                                return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-                            },
-                            calc() {
-                                if (!this.started) { this.timeLeft = this.duration; return; }
-                                const now = Math.floor(Date.now() / 1000);
-                                const elapsed = now - this.started;
-                                this.timeLeft = Math.max(0, this.duration - elapsed);
-                            },
-                            init() { this.calc(); this.interval = setInterval(() => this.calc(), 1000); }
-                        }">
-                            <small class="text-muted d-block mb-1">SISA WAKTU</small>
-                            <div style="font-size: 2rem; font-weight: 800; font-family: monospace;"
-                                :style="timeLeft <= 30 ? 'color: var(--primary-color);' : 'color: var(--text-primary);'">
-                                <span x-text="formatted"></span>
-                            </div>
-                        </div>
-
-                        {{-- Slide Control --}}
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <small class="text-muted fw-semibold">Slide {{ $currentSlideIndex + 1 }} / {{ max(1, $slidesCount) }}</small>
-                                <button class="btn btn-sm btn-outline-secondary" wire:click="resetTimer">
-                                    <i class="fas fa-redo"></i> Reset Timer
-                                </button>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary flex-fill" wire:click="prevSlide" {{ $currentSlideIndex <= 0 ? 'disabled' : '' }}>
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="btn btn-primary flex-fill" wire:click="nextSlide" {{ $currentSlideIndex >= $slidesCount - 1 ? 'disabled' : '' }}>
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        @if (count($slides) > 0 && isset($slides[$currentSlideIndex]))
-                            <div class="text-center bg-dark rounded overflow-hidden" style="position: relative; padding: 0.5rem;">
-                                <img src="{{ Storage::url($slides[$currentSlideIndex]['file_gambar']) }}"
-                                     alt="Preview Slide"
-                                     style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px;">
-                            </div>
-                        @endif
-
-                        <hr style="border-color: var(--border-color);">
-                        <button class="btn btn-danger w-100" wire:click="goToScoring">
-                            <i class="fas fa-clipboard-check me-2"></i>Selesai → Penilaian
-                        </button>
-                    @elseif ($phase === 'scoring')
-                        <div class="py-3">
-                            <h6 class="text-center mb-3" style="color: var(--text-primary); font-weight: 600;">
-                                <i class="fas fa-clipboard-check me-2" style="color: var(--primary-color);"></i>Penilaian Juri
-                            </h6>
-
-                            @foreach ($juriScoringDetails as $juri)
-                                <div class="d-flex align-items-center justify-content-between px-3 py-2 mb-2 rounded"
-                                    style="background: var(--hover-bg); border: 1px solid var(--border-color);">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div style="width: 32px; height: 32px; border-radius: 50%;
-                                            background: {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }};
-                                            color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
-                                            @if ($juri['scored'])
-                                                <i class="fas fa-check"></i>
-                                            @else
-                                                <i class="fas fa-hourglass-half" style="color: var(--text-muted);"></i>
-                                            @endif
-                                        </div>
-                                        <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-primary);">{{ $juri['nama'] }}</span>
+                        <div class="row align-items-center g-4 mb-4">
+                            {{-- Timer --}}
+                            <div class="col-md-5 text-center" style="border-right: 2px dashed var(--border-color);">
+                                <div x-data="{
+                                    started: {{ $timerStartedAt ?? 'null' }},
+                                    duration: {{ \App\Livewire\Admin\PresentasiControl::TIMER_DURATION }},
+                                    timeLeft: 0,
+                                    interval: null,
+                                    get formatted() {
+                                        const m = Math.floor(this.timeLeft / 60);
+                                        const s = this.timeLeft % 60;
+                                        return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                                    },
+                                    calc() {
+                                        if (!this.started) { this.timeLeft = this.duration; return; }
+                                        const now = Math.floor(Date.now() / 1000);
+                                        const elapsed = now - this.started;
+                                        this.timeLeft = Math.max(0, this.duration - elapsed);
+                                    },
+                                    init() { this.calc(); this.interval = setInterval(() => this.calc(), 1000); }
+                                }">
+                                    <h6 class="text-muted d-block mb-3" style="font-weight: 700; letter-spacing: 1px;">SISA WAKTU PRESENTASI</h6>
+                                    <div style="font-size: 4.5rem; font-weight: 900; font-family: monospace; line-height: 1;"
+                                        :style="timeLeft <= 30 ? 'color: var(--primary-color);' : 'color: var(--text-primary);'">
+                                        <span x-text="formatted"></span>
                                     </div>
-                                    <span class="badge {{ $juri['scored'] ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.7rem;">
-                                        {{ $juri['scored'] ? '✓' : '...' }}
-                                    </span>
+                                    <button class="btn btn-sm btn-outline-secondary mt-3" wire:click="resetTimer">
+                                        <i class="fas fa-redo me-1"></i>Reset Timer
+                                    </button>
                                 </div>
-                            @endforeach
+                            </div>
 
-                            <hr style="border-color: var(--border-color);">
+                            {{-- Slide Control --}}
+                            <div class="col-md-7">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0 text-muted" style="font-weight: 700;">KONTROL SLIDE</h6>
+                                    <span class="badge bg-secondary" style="font-size: 0.9rem;">Slide {{ $currentSlideIndex + 1 }} / {{ max(1, $slidesCount) }}</span>
+                                </div>
+                                <div class="d-flex gap-3 mb-3">
+                                    <button class="btn btn-outline-primary flex-fill py-4" wire:click="prevSlide" {{ $currentSlideIndex <= 0 ? 'disabled' : '' }} style="border-width: 2px;">
+                                        <i class="fas fa-chevron-left fa-2x"></i>
+                                    </button>
+                                    <button class="btn btn-primary flex-fill py-4" wire:click="nextSlide" {{ $currentSlideIndex >= $slidesCount - 1 ? 'disabled' : '' }}>
+                                        <i class="fas fa-chevron-right fa-2x"></i>
+                                    </button>
+                                </div>
+                                @if (count($slides) > 0 && isset($slides[$currentSlideIndex]))
+                                    <div class="bg-dark rounded overflow-hidden shadow-sm" style="position: relative; padding: 0.5rem; height: 160px; display: flex; align-items: center; justify-content: center;">
+                                        <img src="{{ Storage::url($slides[$currentSlideIndex]['file_gambar']) }}"
+                                             alt="Preview Slide"
+                                             style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;">
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <hr style="border-color: var(--border-color); margin-top: 2rem; margin-bottom: 1.5rem;">
+                        <button class="btn btn-danger btn-lg w-100 py-3" style="font-size: 1.25rem; font-weight: 700;" wire:click="goToScoring">
+                            <i class="fas fa-clipboard-check me-2"></i>Selesai & Lanjut Penilaian Juri
+                        </button>
+
+                    @elseif ($phase === 'scoring')
+                        <div class="py-4">
+                            <h4 class="text-center mb-4" style="color: var(--text-primary); font-weight: 800;">
+                                <i class="fas fa-star me-2" style="color: #ffc107;"></i>Status Penilaian Juri
+                            </h4>
+
+                            <div class="row g-3 mb-4">
+                                @foreach ($juriScoringDetails as $juri)
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center justify-content-between px-4 py-3 rounded"
+                                            style="background: var(--hover-bg); border: 2px solid {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }};">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div style="width: 40px; height: 40px; border-radius: 50%;
+                                                    background: {{ $juri['scored'] ? '#28a745' : 'var(--bg-white)' }};
+                                                    border: 2px solid {{ $juri['scored'] ? '#28a745' : 'var(--text-muted)' }};
+                                                    color: {{ $juri['scored'] ? 'white' : 'var(--text-muted)' }}; 
+                                                    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                                                    @if ($juri['scored'])
+                                                        <i class="fas fa-check"></i>
+                                                    @else
+                                                        <i class="fas fa-hourglass-half"></i>
+                                                    @endif
+                                                </div>
+                                                <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">{{ $juri['nama'] }}</span>
+                                            </div>
+                                            <span class="badge {{ $juri['scored'] ? 'bg-success' : 'bg-secondary' }}" style="font-size: 0.8rem; padding: 0.5rem 0.8rem;">
+                                                {{ $juri['scored'] ? 'Sudah Menilai' : 'Menunggu' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <hr style="border-color: var(--border-color); margin-bottom: 1.5rem;">
 
                             @php $nextIdx = $currentIndex !== null ? $currentIndex + 1 : null; @endphp
-                            <button class="btn btn-primary w-100" wire:click="nextMahasiswa">
+                            <button class="btn btn-primary btn-lg w-100 py-3" style="font-size: 1.25rem; font-weight: 700;" wire:click="nextMahasiswa">
                                 <i class="fas fa-arrow-right me-2"></i>
                                 @if ($nextIdx !== null && $nextIdx < count($mahasiswaList))
-                                    Lanjut ke Peserta Berikutnya
+                                    Pindah ke Peserta Selanjutnya
                                 @else
-                                    Selesaikan Presentasi
+                                    Selesaikan Seluruh Sesi Presentasi
                                 @endif
                             </button>
                         </div>
@@ -306,24 +246,34 @@
 
                     {{-- Navigation shortcuts --}}
                     @if ($phase !== 'countdown')
-                        <div class="mt-3 pt-3" style="border-top: 1px solid var(--border-color);">
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-outline-secondary btn-sm flex-fill" wire:click="prevMahasiswa" {{ $currentIndex === 0 ? 'disabled' : '' }}>
-                                    <i class="fas fa-arrow-left"></i> Sebelum
+                        <div class="mt-4 pt-3" style="border-top: 1px dashed var(--border-color);">
+                            <div class="d-flex gap-3">
+                                <button class="btn btn-outline-secondary flex-fill" wire:click="prevMahasiswa" {{ $currentIndex === 0 ? 'disabled' : '' }}>
+                                    <i class="fas fa-arrow-left me-1"></i> Kembali ke Peserta Sebelumnya
                                 </button>
-                                <button class="btn btn-outline-secondary btn-sm flex-fill" wire:click="nextMahasiswa" {{ $currentIndex >= count($mahasiswaList) - 1 ? 'disabled' : '' }}>
-                                    Selanjutnya <i class="fas fa-arrow-right"></i>
+                                <button class="btn btn-outline-secondary flex-fill" wire:click="nextMahasiswa" {{ $currentIndex >= count($mahasiswaList) - 1 ? 'disabled' : '' }}>
+                                    Lompat ke Peserta Berikutnya <i class="fas fa-arrow-right ms-1"></i>
                                 </button>
                             </div>
                         </div>
                     @endif
                 </div>
+            @else
+                <div class="modern-card mb-4 text-center py-5">
+                    <i class="fas fa-play-circle mb-3" style="font-size: 4rem; color: var(--text-muted);"></i>
+                    <h4 style="color: var(--text-primary); font-weight: 700;">Presentasi Belum Dimulai</h4>
+                    <p class="text-muted">Klik tombol "Mulai Presentasi" di sudut kanan atas untuk memulai.</p>
+                </div>
             @endif
+        </div>
 
+        {{-- Right Column: SIDEBAR (Backsound & List) --}}
+        <div class="col-12 col-lg-5 col-xl-4">
+            
             {{-- Backsound Panel --}}
-            <div class="modern-card mb-4" style="border: 1px solid var(--border-color);">
+            <div class="modern-card mb-4" style="border: 2px solid var(--border-color);">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0" style="color: var(--text-primary); font-weight: 600;">
+                    <h5 class="mb-0" style="color: var(--text-primary); font-weight: 700;">
                         <i class="fas fa-music me-2" style="color: var(--primary-color);"></i>Backsound
                     </h5>
                     <a href="{{ route('admin.backsound') }}" class="btn btn-sm btn-outline-secondary" title="Kelola Backsound">
@@ -335,27 +285,28 @@
                 @if ($currentBacksound)
                     <div class="d-flex align-items-center gap-3 p-3 mb-3 rounded-3"
                         style="background: linear-gradient(135deg, rgba(230,43,30,0.08), rgba(230,43,30,0.02)); border: 1px solid rgba(230,43,30,0.2);">
-                        <div class="d-flex align-items-center gap-1 flex-shrink-0" style="width: 24px; height: 24px;">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                             @if ($musicPlaying)
-                                <div class="eq-bar" style="width: 4px; background: var(--primary-color); border-radius: 2px; animation: eqAnim1 0.5s ease-in-out infinite alternate;"></div>
-                                <div class="eq-bar" style="width: 4px; background: var(--primary-color); border-radius: 2px; animation: eqAnim2 0.6s ease-in-out infinite alternate;"></div>
-                                <div class="eq-bar" style="width: 4px; background: var(--primary-color); border-radius: 2px; animation: eqAnim3 0.4s ease-in-out infinite alternate;"></div>
-                                <div class="eq-bar" style="width: 4px; background: var(--primary-color); border-radius: 2px; animation: eqAnim1 0.55s ease-in-out infinite alternate;"></div>
+                                <div class="d-flex align-items-end gap-1" style="height: 14px;">
+                                    <div class="eq-bar" style="width: 3px; background: var(--primary-color); border-radius: 2px; animation: eqAnim1 0.5s ease-in-out infinite alternate;"></div>
+                                    <div class="eq-bar" style="width: 3px; background: var(--primary-color); border-radius: 2px; animation: eqAnim2 0.6s ease-in-out infinite alternate;"></div>
+                                    <div class="eq-bar" style="width: 3px; background: var(--primary-color); border-radius: 2px; animation: eqAnim3 0.4s ease-in-out infinite alternate;"></div>
+                                </div>
                             @else
-                                <i class="fas fa-pause" style="color: var(--text-muted); font-size: 1rem;"></i>
+                                <i class="fas fa-pause" style="color: var(--primary-color); font-size: 1rem;"></i>
                             @endif
                         </div>
                         <div class="flex-grow-1 min-w-0">
-                            <small class="text-muted d-block" style="font-size: 0.7rem;">{{ $musicPlaying ? 'SEDANG DIPUTAR' : 'DIJEDA' }}</small>
-                            <span class="fw-semibold d-block text-truncate" style="color: var(--text-primary); font-size: 0.9rem;">{{ $currentBacksound->judul }}</span>
+                            <small class="text-muted d-block" style="font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;">{{ $musicPlaying ? 'SEDANG DIPUTAR' : 'DIJEDA' }}</small>
+                            <span class="fw-bold d-block text-truncate" style="color: var(--text-primary); font-size: 1rem;">{{ $currentBacksound->judul }}</span>
                         </div>
                         <div class="d-flex gap-1">
                             @if ($musicPlaying)
-                                <button class="btn btn-sm btn-outline-secondary" wire:click="stopBacksound" title="Jeda">
+                                <button class="btn btn-outline-danger btn-sm" wire:click="stopBacksound" title="Jeda" style="width: 36px; height: 36px; border-radius: 50%;">
                                     <i class="fas fa-pause"></i>
                                 </button>
                             @else
-                                <button class="btn btn-sm btn-primary" wire:click="resumeBacksound" title="Lanjutkan">
+                                <button class="btn btn-primary btn-sm" wire:click="resumeBacksound" title="Lanjutkan" style="width: 36px; height: 36px; border-radius: 50%;">
                                     <i class="fas fa-play"></i>
                                 </button>
                             @endif
@@ -365,10 +316,10 @@
 
                 {{-- Playlist --}}
                 @if ($backsounds->count() > 0)
-                    <div style="max-height: 220px; overflow-y: auto;">
+                    <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;" class="custom-scrollbar">
                         @foreach ($backsounds as $bs)
-                            <div class="d-flex align-items-center justify-content-between px-3 py-2 mb-1 rounded-2"
-                                style="background: {{ $currentBacksoundId == $bs->id ? 'rgba(230,43,30,0.06)' : 'var(--hover-bg)' }}; border: 1px solid {{ $currentBacksoundId == $bs->id ? 'rgba(230,43,30,0.2)' : 'transparent' }}; transition: all 0.2s; cursor: pointer;"
+                            <div class="d-flex align-items-center justify-content-between px-3 py-2 mb-2 rounded"
+                                style="background: {{ $currentBacksoundId == $bs->id ? 'rgba(230,43,30,0.06)' : 'var(--bg-white)' }}; border: 1px solid {{ $currentBacksoundId == $bs->id ? 'rgba(230,43,30,0.2)' : 'var(--border-color)' }}; transition: all 0.2s; cursor: pointer;"
                                 @if ($currentBacksoundId == $bs->id && $musicPlaying)
                                     wire:click="stopBacksound"
                                 @else
@@ -376,35 +327,79 @@
                                 @endif>
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     @if ($currentBacksoundId == $bs->id && $musicPlaying)
-                                        <i class="fas fa-volume-up" style="color: var(--primary-color); font-size: 0.8rem; width: 16px;"></i>
+                                        <i class="fas fa-volume-up" style="color: var(--primary-color); width: 20px;"></i>
                                     @else
-                                        <i class="fas fa-music" style="color: var(--text-muted); font-size: 0.8rem; width: 16px;"></i>
+                                        <i class="fas fa-music" style="color: var(--text-muted); width: 20px;"></i>
                                     @endif
-                                    <span class="text-truncate" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary);">{{ $bs->judul }}</span>
+                                    <span class="text-truncate" style="font-size: 0.95rem; font-weight: 500; color: var(--text-primary);">{{ $bs->judul }}</span>
                                 </div>
                                 <div class="flex-shrink-0">
                                     @if ($currentBacksoundId == $bs->id && $musicPlaying)
-                                        <span class="badge bg-danger" style="font-size: 0.65rem;">
-                                            <i class="fas fa-stop me-1"></i>Stop
-                                        </span>
+                                        <span class="badge bg-danger" style="font-size: 0.7rem;">STOP</span>
                                     @else
-                                        <span class="badge bg-secondary" style="font-size: 0.65rem;">
-                                            <i class="fas fa-play me-1"></i>Putar
-                                        </span>
+                                        <span class="badge bg-secondary" style="font-size: 0.7rem;">PLAY</span>
                                     @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 @else
-                    <div class="text-center py-3" style="background: var(--hover-bg); border-radius: 8px;">
-                        <i class="fas fa-music text-muted mb-2" style="font-size: 1.5rem;"></i>
-                        <p class="text-muted mb-1" style="font-size: 0.85rem;">Belum ada backsound</p>
-                        <a href="{{ route('admin.backsound') }}" class="btn btn-sm btn-outline-primary mt-1">
-                            <i class="fas fa-plus me-1"></i>Tambah Backsound
+                    <div class="text-center py-4" style="background: var(--hover-bg); border-radius: 12px;">
+                        <i class="fas fa-music text-muted mb-2" style="font-size: 2rem;"></i>
+                        <p class="text-muted mb-2" style="font-size: 0.9rem;">Belum ada backsound</p>
+                        <a href="{{ route('admin.backsound') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1"></i>Tambah
                         </a>
                     </div>
                 @endif
+            </div>
+
+            {{-- Mahasiswa Order List (Simplified for Sidebar) --}}
+            <div class="modern-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0" style="color: var(--text-primary); font-weight: 700;">
+                        <i class="fas fa-list-ol me-2" style="color: var(--primary-color);"></i>Daftar Peserta
+                    </h5>
+                    <span class="badge bg-primary rounded-pill">{{ count($mahasiswaList) }}</span>
+                </div>
+                
+                <div style="max-height: 400px; overflow-y: auto; padding-right: 5px;" class="custom-scrollbar">
+                    @foreach ($mahasiswaList as $idx => $mhs)
+                        @php
+                            $isCurrent = $isActive && $mhs['id'] == $currentMahasiswaId;
+                            $scored = $scoredStats[$mhs['id']] ?? 0;
+                            $allScored = $scored >= $juriCount && $juriCount > 0;
+                        @endphp
+                        <div class="d-flex align-items-center p-2 mb-2 rounded border" style="background: {{ $isCurrent ? 'rgba(230,43,30,0.05)' : 'var(--bg-white)' }}; border-color: {{ $isCurrent ? 'var(--primary-color) !important' : 'var(--border-color)' }}; transition: all 0.2s;">
+                            <div class="text-center me-3" style="min-width: 36px;">
+                                <span class="badge {{ $isCurrent ? 'bg-danger' : 'bg-secondary' }} rounded-pill" style="font-size: 0.85rem; padding: 0.4rem 0.6rem;">
+                                    {{ $mhs['urutan_tampil'] }}
+                                </span>
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <h6 class="mb-0 text-truncate" style="font-size: 0.95rem; color: var(--text-primary); {{ $isCurrent ? 'font-weight: 800;' : 'font-weight: 600;' }}">
+                                    @if ($isCurrent)
+                                        <i class="fas fa-play text-danger me-1" style="font-size: 0.7rem;"></i>
+                                    @endif
+                                    {{ $mhs['nama'] }}
+                                </h6>
+                                <div class="d-flex align-items-center mt-1">
+                                    <div class="progress flex-grow-1 me-2" style="height: 5px; background: var(--border-color);">
+                                        <div class="progress-bar {{ $allScored ? 'bg-success' : 'bg-warning' }}" style="width: {{ $juriCount > 0 ? ($scored / $juriCount) * 100 : 0 }}%;"></div>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.7rem; font-weight: 600;">{{ $scored }}/{{ $juriCount }}</small>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                @if ($isActive && !$isCurrent)
+                                    <button class="btn btn-sm btn-light border shadow-sm" wire:click="goToMahasiswa({{ $mhs['id'] }})" title="Lompat ke peserta ini">
+                                        <i class="fas fa-share text-secondary"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             {{-- Persistent audio player (wire:ignore prevents Livewire from destroying it) --}}

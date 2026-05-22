@@ -43,8 +43,8 @@
                 <div class="form-floating position-relative" wire:key="non-admin-nim-field-{{ $role }}">
                     <i class="fas fa-id-card input-icon"></i>
                     <input type="text" wire:model="nim" class="form-control @error('nim') is-invalid @enderror"
-                        id="nim" placeholder="{{ $role === 'juri' ? 'NIM / NIP' : 'NIM' }}" autofocus>
-                    <label for="nim">{{ $role === 'juri' ? 'NIM / NIP' : 'NIM' }}</label>
+                        id="nim" placeholder="{{ $role === 'juri' ? 'NIM / EMAIL' : 'NIM' }}" autofocus>
+                    <label for="nim">{{ $role === 'juri' ? 'NIM / EMAIL' : 'NIM' }}</label>
                     @error('nim')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -64,7 +64,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
             <script>
                 function togglePassword() {
                     const input = document.getElementById('password');
