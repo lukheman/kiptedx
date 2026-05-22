@@ -40,6 +40,7 @@
             <table class="table table-modern">
                 <thead>
                     <tr>
+                        <th style="width: 80px;" class="text-center">Foto</th>
                         <th style="cursor: pointer;" wire:click="sortByColumn('nim')">
                             NIM / NIP
                             @if ($sortBy === 'nim')
@@ -62,6 +63,15 @@
                 <tbody>
                     @forelse ($juris as $juri)
                         <tr wire:key="juri-{{ $juri->id }}">
+                            <td class="text-center">
+                                @if ($juri->hasAvatar())
+                                    <img src="{{ $juri->avatarUrl() }}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color);">
+                                @else
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-light); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                @endif
+                            </td>
                             <td style="color: var(--text-secondary); font-weight: 600;">{{ $juri->nim }}</td>
                             <td>
                                 <div class="fw-semibold" style="color: var(--text-primary);">{{ $juri->nama }}</div>
@@ -79,7 +89,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="text-center py-4">
+                            <td colspan="4" class="text-center py-4">
                                 <div class="text-muted">
                                     <i class="fas fa-user-tie mb-2" style="font-size: 2rem;"></i>
                                     <p class="mb-0">Tidak ada data juri</p>
@@ -129,6 +139,28 @@
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="foto_profil" class="form-label">Foto Profil <small class="text-muted">(opsional, maks 2MB, JPG/PNG)</small></label>
+                        <input type="file" class="form-control @error('foto_profil') is-invalid @enderror" id="foto_profil"
+                            wire:model="foto_profil" accept="image/*">
+                        @error('foto_profil')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+
+                        {{-- Photo Preview --}}
+                        @if ($foto_profil)
+                            <div class="mt-2">
+                                <span class="d-block text-muted mb-1" style="font-size: 0.85rem;">Preview:</span>
+                                <img src="{{ $foto_profil->temporaryUrl() }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);">
+                            </div>
+                        @elseif ($current_foto_profil)
+                            <div class="mt-2">
+                                <span class="d-block text-muted mb-1" style="font-size: 0.85rem;">Foto saat ini:</span>
+                                <img src="{{ Storage::url($current_foto_profil) }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);">
+                            </div>
+                        @endif
                     </div>
 
                     <div class="mb-3">

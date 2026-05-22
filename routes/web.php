@@ -37,6 +37,7 @@ Route::prefix('mahasiswa')->middleware('auth:mahasiswa')->group(function () {
 // Juri Routes
 Route::prefix('juri')->middleware('auth:juri')->group(function () {
     Route::get('/presentasi', Presentasi::class)->name('juri.presentasi');
+    Route::get('/profile', \App\Livewire\Juri\Profile::class)->name('juri.profile');
     Route::post('/logout', [App\Http\Controllers\Juri\LogoutController::class, '__invoke'])->name('juri.logout');
 });
 

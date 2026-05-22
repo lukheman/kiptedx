@@ -38,7 +38,7 @@
             
             if ($isJuri) {
                 $user = Auth::guard('juri')->user();
-                $profileRoute = route('juri.presentasi');
+                $profileRoute = route('juri.profile');
                 $logoutRoute = route('juri.logout');
             } elseif ($isMahasiswa) {
                 $user = Auth::guard('mahasiswa')->user();

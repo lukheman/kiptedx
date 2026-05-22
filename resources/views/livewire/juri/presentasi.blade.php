@@ -83,7 +83,7 @@
                 init() { this.calc(); this.interval = setInterval(() => this.calc(), 1000); }
             }">
             <div class="text-center">
-                <div style="font-size: 5rem; font-weight: 900; font-family: monospace; color: var(--primary-color); margin-bottom: 1rem;">
+                <div class="display-1 fw-bold" style="font-family: monospace; color: var(--primary-color); margin-bottom: 1rem; line-height: 1;">
                     <span x-text="formatted"></span>
                 </div>
                 <h3 style="color: var(--text-primary); font-weight: 700;">Presentasi Akan Segera Dimulai</h3>
@@ -105,22 +105,23 @@
                 <div class="mb-4" style="animation: introFloat 3s ease-in-out infinite;">
                     @if ($currentMahasiswa->hasAvatar())
                         <img src="{{ $currentMahasiswa->avatarUrl() }}" alt="{{ $currentMahasiswa->nama }}"
-                            style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
+                            class="intro-avatar"
+                            style="border-radius: 50%; object-fit: cover;
                             border: 4px solid var(--primary-color); box-shadow: 0 15px 40px rgba(230,43,30,0.25);">
                     @else
-                        <div style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto;
+                        <div class="intro-avatar" style="border-radius: 50%; margin: 0 auto;
                             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
                             color: white; display: flex; align-items: center; justify-content: center;
-                            font-size: 4rem; font-weight: 900; box-shadow: 0 15px 40px rgba(230,43,30,0.25);">
+                            font-weight: 900; box-shadow: 0 15px 40px rgba(230,43,30,0.25);">
                             {{ $currentMahasiswa->urutan_tampil }}
                         </div>
                     @endif
                 </div>
 
-                <span class="badge" style="background: var(--primary-color); color: white; font-size: 0.9rem; padding: 0.4rem 1.2rem; border-radius: 50px; margin-bottom: 0.75rem; display: inline-block;">
+                <span class="badge" style="background: var(--primary-color); color: white; font-size: 0.85rem; padding: 0.4rem 1.2rem; border-radius: 50px; margin-bottom: 0.75rem; display: inline-block;">
                     Peserta #{{ $currentMahasiswa->urutan_tampil }}
                 </span>
-                <h2 style="color: var(--text-primary); font-weight: 800; margin-bottom: 0.5rem;">{{ $currentMahasiswa->nama }}</h2>
+                <h2 class="h3 h2-md" style="color: var(--text-primary); font-weight: 800; margin-bottom: 0.5rem;">{{ $currentMahasiswa->nama }}</h2>
                 <p class="text-muted">NIM: {{ $currentMahasiswa->nim }}</p>
 
                 @if ($currentMahasiswa->tema)
@@ -164,8 +165,8 @@
             }" x-init="init()">
 
             {{-- Presenter Info + Timer --}}
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                <div class="d-flex align-items-center gap-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3 text-center text-md-start">
+                <div class="d-flex flex-column flex-md-row align-items-center gap-3 w-100">
                     @if ($currentMahasiswa->hasAvatar())
                         <img src="{{ $currentMahasiswa->avatarUrl() }}" alt="Foto" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color);">
                     @else
@@ -173,44 +174,47 @@
                             {{ $currentMahasiswa->urutan_tampil }}
                         </div>
                     @endif
-                    <div>
-                        <h4 class="mb-1" style="color: var(--text-primary); font-weight: 700;">
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1 h5" style="color: var(--text-primary); font-weight: 700;">
                             @if (!$currentMahasiswa->hasAvatar())
-                                <span class="badge bg-danger me-2" style="font-size: 0.8rem;">{{ $currentMahasiswa->urutan_tampil }}</span>
+                                <span class="badge bg-danger me-2 d-md-none" style="font-size: 0.8rem;">{{ $currentMahasiswa->urutan_tampil }}</span>
                             @endif
                             {{ $currentMahasiswa->nama }}
                         </h4>
-                    <small class="text-muted">
-                        NIM: {{ $currentMahasiswa->nim }}
-                        @if ($currentMahasiswa->tema)
-                            &middot; Tema: <strong>{{ $currentMahasiswa->tema->judul }}</strong>
-                        @endif
-                    </small>
-                </div>
+                        <div class="text-muted small d-flex flex-column flex-md-row align-items-center gap-1 justify-content-center justify-content-md-start">
+                            <span>NIM: {{ $currentMahasiswa->nim }}</span>
+                            @if ($currentMahasiswa->tema)
+                                <span class="d-none d-md-inline">&middot;</span>
+                                <span>Tema: <strong>{{ $currentMahasiswa->tema->judul }}</strong></span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Timer --}}
-                @if ($phase === 'presenting')
-                    <div class="modern-card py-2 px-4 text-center mb-0" style="min-width: 150px;"
-                        :style="timeLeft <= 30 ? 'border-color: var(--primary-color);' : ''">
-                        <small class="text-muted d-block" style="font-size: 0.7rem;">SISA WAKTU</small>
-                        <div style="font-size: 1.75rem; font-weight: 800; font-family: monospace;"
-                            :style="timeLeft <= 30 ? 'color: var(--primary-color);' : 'color: var(--text-primary);'">
-                            <span x-text="formattedTime"></span>
+                <div class="w-100 d-flex justify-content-center justify-content-md-end" style="max-width: 200px;">
+                    @if ($phase === 'presenting')
+                        <div class="modern-card py-2 px-3 text-center mb-0 w-100"
+                            :style="timeLeft <= 30 ? 'border-color: var(--primary-color);' : ''">
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">SISA WAKTU</small>
+                            <div style="font-size: 1.5rem; font-weight: 800; font-family: monospace;"
+                                :style="timeLeft <= 30 ? 'color: var(--primary-color);' : 'color: var(--text-primary);'">
+                                <span x-text="formattedTime"></span>
+                            </div>
                         </div>
-                    </div>
-                @else
-                    <div class="modern-card py-2 px-4 text-center mb-0" style="min-width: 150px; border-color: var(--primary-color);">
-                        <small class="text-muted d-block" style="font-size: 0.7rem;">STATUS</small>
-                        <div style="font-size: 1rem; font-weight: 700; color: var(--primary-color);">
-                            <i class="fas fa-clipboard-check me-1"></i>Penilaian
+                    @else
+                        <div class="modern-card py-2 px-3 text-center mb-0 w-100" style="border-color: var(--primary-color);">
+                            <small class="text-muted d-block" style="font-size: 0.7rem;">STATUS</small>
+                            <div style="font-size: 1rem; font-weight: 700; color: var(--primary-color);">
+                                <i class="fas fa-clipboard-check me-1"></i>Penilaian
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
 
             {{-- Navigator Pills --}}
-            <div class="d-flex flex-wrap gap-2 mb-4">
+            <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2 mb-4">
                 @foreach ($mahasiswaList as $mhs)
                     @php
                         $isCurrent = $mhs->id == $currentMahasiswaId;
@@ -224,51 +228,29 @@
             </div>
 
             <div class="row">
-                {{-- Slide Viewer / Scoring Panel --}}
-                <div class="col-12 col-lg-8 mb-4">
-                    @if ($phase === 'presenting')
-                        {{-- Slide View --}}
-                        <div class="modern-card" style="padding: 0; overflow: hidden;">
-                            @if (count($slides) > 0)
-                                <div style="background: #000; min-height: 400px; display: flex; align-items: center; justify-content: center; position: relative;">
-                                    <img src="{{ Storage::url($slides[$currentSlideIndex]['file_gambar']) }}"
-                                        alt="Slide {{ $currentSlideIndex + 1 }}"
-                                        style="max-width: 100%; max-height: 500px; object-fit: contain;">
-                                    <div style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
-                                        {{ $currentSlideIndex + 1 }} / {{ count($slides) }}
-                                    </div>
-                                </div>
-                            @else
-                                <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
-                                    <div class="text-center text-muted">
-                                        <i class="fas fa-image mb-3" style="font-size: 3rem;"></i>
-                                        <p class="mb-0">Mahasiswa ini belum memiliki slide presentasi.</p>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    @else
-                        {{-- Scoring Panel --}}
-                        <div class="modern-card" style="overflow: hidden; border: 2px solid var(--primary-color); min-height: 400px;"
-                            x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)"
-                            x-show="show"
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100">
+                <div class="col-12 col-lg-8 mb-4 order-2 order-lg-1">
+                    {{-- Scoring Info Panel --}}
+                    <div class="modern-card h-100" style="overflow: hidden; border: 2px solid var(--primary-color);"
+                        x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)"
+                        x-show="show"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100">
 
-                            <div class="d-flex align-items-start gap-4 py-4 px-3">
+                            <div class="d-flex flex-column flex-lg-row align-items-center align-items-lg-start gap-4 py-4 px-3 text-center text-lg-start">
                                 {{-- Presenter Photo --}}
-                                <div class="text-center flex-shrink-0" style="min-width: 160px;">
+                                <div class="flex-shrink-0" style="min-width: 140px;">
                                     @if ($currentMahasiswa->hasAvatar())
                                         <img src="{{ $currentMahasiswa->avatarUrl() }}" alt="{{ $currentMahasiswa->nama }}"
-                                            style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+                                            class="info-avatar"
+                                            style="border-radius: 50%; object-fit: cover;
                                             border: 4px solid var(--primary-color); box-shadow: 0 10px 30px rgba(230,43,30,0.2);
-                                            animation: introFloat 3s ease-in-out infinite;">
+                                            animation: introFloat 3s ease-in-out infinite; margin: 0 auto;">
                                     @else
-                                        <div style="width: 130px; height: 130px; border-radius: 50%; margin: 0 auto;
+                                        <div class="info-avatar" style="border-radius: 50%; margin: 0 auto;
                                             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
                                             color: white; display: flex; align-items: center; justify-content: center;
-                                            font-size: 3.5rem; font-weight: 900; box-shadow: 0 10px 30px rgba(230,43,30,0.2);
+                                            font-weight: 900; box-shadow: 0 10px 30px rgba(230,43,30,0.2);
                                             animation: introFloat 3s ease-in-out infinite;">
                                             {{ $currentMahasiswa->urutan_tampil }}
                                         </div>
@@ -282,7 +264,7 @@
                                 </div>
 
                                 {{-- Juri Scoring Status --}}
-                                <div class="flex-grow-1">
+                                <div class="flex-grow-1 w-100">
                                     <div class="text-center mb-3">
                                         <i class="fas fa-clipboard-check" style="font-size: 2rem; color: var(--primary-color);"></i>
                                         <h4 style="color: var(--text-primary); font-weight: 700; margin-top: 0.5rem;">Penilaian Juri</h4>
@@ -324,12 +306,11 @@
                                 </div>
                             </div>
                         </div>
-                    @endif
                 </div>
 
                 {{-- Scoring Panel --}}
-                <div class="col-12 col-lg-4 mb-4">
-                    <div class="modern-card">
+                <div class="col-12 col-lg-4 mb-4 order-1 order-lg-2">
+                    <div class="modern-card h-100">
                         <h5 class="mb-4" style="color: var(--text-primary); font-weight: 600;">
                             <i class="fas fa-star me-2" style="color: #ffc107;"></i>Penilaian
                         </h5>
@@ -385,6 +366,12 @@
     @endif
 
     <style>
+        .intro-avatar { width: 120px; height: 120px; font-size: 3rem; }
+        .info-avatar { width: 100px; height: 100px; font-size: 2.5rem; }
+        @media(min-width: 768px) {
+            .intro-avatar { width: 150px; height: 150px; font-size: 4rem; }
+            .info-avatar { width: 130px; height: 130px; font-size: 3.5rem; }
+        }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }

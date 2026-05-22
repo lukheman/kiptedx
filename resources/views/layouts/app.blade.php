@@ -624,7 +624,7 @@
 
         <x-sidebar-section title="Account">
             @if(Auth::guard('juri')->check())
-                {{-- Juri has no profile page, just show presentasi --}}
+                <x-sidebar-link href="{{ route('juri.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('juri.profile')">Profile</x-sidebar-link>
             @elseif(Auth::guard('mahasiswa')->check())
                 <x-sidebar-link href="{{ route('mahasiswa.profile') }}" icon="fas fa-user-circle" :active="request()->routeIs('mahasiswa.profile')">Profile</x-sidebar-link>
             @else

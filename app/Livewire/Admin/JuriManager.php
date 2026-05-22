@@ -4,16 +4,18 @@ namespace App\Livewire\Admin;
 
 use App\Models\Juri;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Title('Manajemen Juri')]
 class JuriManager extends Component
 {
-    use WithPagination;
+    use WithFileUploads, WithPagination;
 
     #[Url(as: 'q')]
     public string $search = '';
@@ -30,6 +32,10 @@ class JuriManager extends Component
 
     public string $password_confirmation = '';
 
+    public $foto_profil;
+
+    public ?string $current_foto_profil = null;
+
     public ?int $editingId = null;
 
     public bool $showModal = false;
@@ -42,6 +48,7 @@ class JuriManager extends Component
     {
         $rules = [
             'nama' => ['required', 'string', 'max:255'],
+            'foto_profil' => ['nullable', 'image', 'max:2048'], // max 2MB
         ];
 
         if ($this->editingId) {
@@ -75,6 +82,7 @@ class JuriManager extends Component
         $this->editingId = $id;
         $this->nim = $juri->nim;
         $this->nama = $juri->nama;
+        $this->current_foto_profil = $juri->foto_profil;
         $this->password = '';
         $this->password_confirmation = '';
         $this->showModal = true;
@@ -84,10 +92,22 @@ class JuriManager extends Component
     {
         $validated = $this->validate();
 
+        $fotoPath = null;
+        if ($this->foto_profil) {
+            $fotoPath = $this->foto_profil->store('foto-juri', 'public');
+        }
+
         if ($this->editingId) {
             $juri = Juri::findOrFail($this->editingId);
             $juri->nim = $validated['nim'];
             $juri->nama = $validated['nama'];
+
+            if ($fotoPath) {
+                if ($juri->foto_profil && Storage::disk('public')->exists($juri->foto_profil)) {
+                    Storage::disk('public')->delete($juri->foto_profil);
+                }
+                $juri->foto_profil = $fotoPath;
+            }
 
             if (! empty($this->password)) {
                 $juri->password = Hash::make($this->password);
@@ -100,6 +120,7 @@ class JuriManager extends Component
                 'nim' => $validated['nim'],
                 'nama' => $validated['nama'],
                 'password' => Hash::make($validated['password']),
+                'foto_profil' => $fotoPath,
             ]);
             session()->flash('success', 'Data Juri berhasil ditambahkan.');
         }
@@ -123,8 +144,14 @@ class JuriManager extends Component
     public function deleteJuri(): void
     {
         if ($this->deletingId) {
-            Juri::destroy($this->deletingId);
-            session()->flash('success', 'Data Juri berhasil dihapus.');
+            $juri = Juri::find($this->deletingId);
+            if ($juri) {
+                if ($juri->foto_profil && Storage::disk('public')->exists($juri->foto_profil)) {
+                    Storage::disk('public')->delete($juri->foto_profil);
+                }
+                $juri->delete();
+                session()->flash('success', 'Data Juri berhasil dihapus.');
+            }
         }
 
         $this->showDeleteModal = false;
@@ -143,6 +170,8 @@ class JuriManager extends Component
         $this->nama = '';
         $this->password = '';
         $this->password_confirmation = '';
+        $this->foto_profil = null;
+        $this->current_foto_profil = null;
         $this->editingId = null;
     }
 

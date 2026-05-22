@@ -38,9 +38,9 @@ class PresentasiControl extends Component
             ->toArray();
     }
 
-    public const TIMER_DURATION = 300; // 5 menit (300 detik)
+    public const TIMER_DURATION = 185; // 5 menit (300 detik)
 
-    public const COUNTDOWN_DURATION = 300; // 5 menit countdown awal
+    public const COUNTDOWN_DURATION = 180; // 5 menit countdown awal
 
     public function loadState()
     {
