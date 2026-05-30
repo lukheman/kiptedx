@@ -81,58 +81,68 @@
             </div>
             
             <script>
-                document.addEventListener('alpine:init', () => {
-                    Alpine.data('cropImage', () => ({
-                        cropper: null,
-                        fileSelected(event) {
-                            const files = event.target.files;
-                            if (files && files.length > 0) {
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    const imageToCrop = document.getElementById('image-to-crop');
-                                    imageToCrop.src = e.target.result;
-                                    
-                                    if (this.cropper) {
-                                        this.cropper.destroy();
-                                    }
-                                    
-                                    const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
-                                    cropModal.show();
+                function initMhsCropImage() {
+                    if (typeof Alpine !== 'undefined' && Alpine.data) {
+                        if (!Alpine.data('cropImage')) {
+                            Alpine.data('cropImage', () => ({
+                                cropper: null,
+                                fileSelected(event) {
+                                    const files = event.target.files;
+                                    if (files && files.length > 0) {
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => {
+                                            const imageToCrop = document.getElementById('image-to-crop');
+                                            imageToCrop.src = e.target.result;
+                                            
+                                            if (this.cropper) {
+                                                this.cropper.destroy();
+                                            }
+                                            
+                                            const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
+                                            cropModal.show();
 
-                                    document.getElementById('cropModal').addEventListener('shown.bs.modal', () => {
-                                        this.cropper = new Cropper(imageToCrop, {
-                                            aspectRatio: 1,
-                                            viewMode: 1,
-                                            autoCropArea: 1,
+                                            document.getElementById('cropModal').addEventListener('shown.bs.modal', () => {
+                                                this.cropper = new Cropper(imageToCrop, {
+                                                    aspectRatio: 1,
+                                                    viewMode: 1,
+                                                    autoCropArea: 1,
+                                                });
+                                            }, { once: true });
+                                        };
+                                        reader.readAsDataURL(files[0]);
+                                    }
+                                },
+                                cropAndSave() {
+                                    if (this.cropper) {
+                                        const canvas = this.cropper.getCroppedCanvas({
+                                            width: 400,
+                                            height: 400,
                                         });
-                                    }, { once: true });
-                                };
-                                reader.readAsDataURL(files[0]);
-                            }
-                        },
-                        cropAndSave() {
-                            if (this.cropper) {
-                                const canvas = this.cropper.getCroppedCanvas({
-                                    width: 400,
-                                    height: 400,
-                                });
-                                
-                                const base64Image = canvas.toDataURL('image/jpeg');
-                                
-                                // Assign to livewire property and trigger method
-                                @this.set('cropped_foto', base64Image);
-                                @this.call('updateFotoProfil');
-                                
-                                // Close modal
-                                const cropModal = bootstrap.Modal.getInstance(document.getElementById('cropModal'));
-                                cropModal.hide();
-                                
-                                // Reset input
-                                document.getElementById('foto-input').value = '';
-                            }
+                                        
+                                        const base64Image = canvas.toDataURL('image/jpeg');
+                                        
+                                        // Assign to livewire property and trigger method
+                                        @this.set('cropped_foto', base64Image);
+                                        @this.call('updateFotoProfil');
+                                        
+                                        // Close modal
+                                        const cropModal = bootstrap.Modal.getInstance(document.getElementById('cropModal'));
+                                        cropModal.hide();
+                                        
+                                        // Reset input
+                                        document.getElementById('foto-input').value = '';
+                                    }
+                                }
+                            }));
                         }
-                    }))
-                })
+                    }
+                }
+
+                if (window.Alpine) {
+                    initMhsCropImage();
+                } else {
+                    document.addEventListener('alpine:init', initMhsCropImage);
+                }
             </script>
         </div>
 

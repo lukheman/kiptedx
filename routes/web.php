@@ -49,6 +49,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/tema', TemaManager::class)->name('admin.tema');
     Route::get('/juri', JuriManager::class)->name('admin.juri');
     Route::get('/presentasi', PresentasiControl::class)->name('admin.presentasi');
+    Route::get('/nilai', \App\Livewire\Admin\NilaiManager::class)->name('admin.nilai');
     Route::get('/backsound', BacksoundManager::class)->name('admin.backsound');
     Route::get('/profile', Profile::class)->name('admin.profile');
     Route::get('/components', ComponentDocs::class)->name('admin.components');

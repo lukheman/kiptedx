@@ -55,12 +55,13 @@ class PresentasiPublic extends Component
         $juriCount = \App\Models\Juri::count();
         $juriScoringDetails = [];
         if ($isActive && $setting->current_mahasiswa_id) {
-            $allJuri = \App\Models\Juri::all(['id', 'nama']);
+            $allJuri = \App\Models\Juri::all(['id', 'nama', 'foto_profil']);
             $scoredJuriIds = \App\Models\Nilai::where('mahasiswa_id', $setting->current_mahasiswa_id)->pluck('juri_id')->toArray();
             foreach ($allJuri as $j) {
                 $juriScoringDetails[] = [
                     'id' => $j->id,
                     'nama' => $j->nama,
+                    'foto_profil' => $j->foto_profil ? \Illuminate\Support\Facades\Storage::url($j->foto_profil) : null,
                     'scored' => in_array($j->id, $scoredJuriIds),
                 ];
             }

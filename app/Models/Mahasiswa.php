@@ -54,4 +54,9 @@ class Mahasiswa extends Authenticatable
     {
         return $this->hasMany(SlidePresentasi::class);
     }
+
+    public function nilais()
+    {
+        return $this->hasMany(Nilai::class);
+    }
 }

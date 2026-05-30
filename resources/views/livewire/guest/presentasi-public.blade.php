@@ -244,10 +244,10 @@
                         <div style="animation: introFloat 3s ease-in-out infinite;">
                             @if ($currentMahasiswa->hasAvatar())
                                 <img src="{{ $currentMahasiswa->avatarUrl() }}" alt="{{ $currentMahasiswa->nama }}"
-                                    style="width: 180px; height: 180px; border-radius: 50%; object-fit: cover;
+                                    style="width: 350px; height: 350px; border-radius: 50%; object-fit: cover;
                                     border: 4px solid var(--primary-color); box-shadow: 0 15px 40px rgba(230,43,30,0.25);">
                             @else
-                                <div style="width: 180px; height: 180px; border-radius: 50%; margin: 0 auto;
+                                <div style="width: 350px; height: 350px; border-radius: 50%; margin: 0 auto;
                                     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
                                     color: white; display: flex; align-items: center; justify-content: center;
                                     font-size: 4rem; font-weight: 900; box-shadow: 0 15px 40px rgba(230,43,30,0.25);">
@@ -279,17 +279,35 @@
                                     <div class="col-4 col-md-4">
                                         <div class="d-flex flex-column align-items-center justify-content-center p-3 rounded-3 h-100 text-center"
                                             style="background: var(--bg-light); border: 2px solid {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }}; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                                            <div style="width: 50px; height: 50px; border-radius: 50%;
-                                                background: {{ $juri['scored'] ? '#28a745' : 'var(--bg-white)' }};
-                                                border: 2px solid {{ $juri['scored'] ? '#28a745' : 'var(--text-muted)' }};
-                                                color: {{ $juri['scored'] ? 'white' : 'var(--text-muted)' }};
-                                                display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
-                                                transition: all 0.5s ease; margin-bottom: 0.75rem;">
-                                                @if ($juri['scored'])
-                                                    <i class="fas fa-check"></i>
+                                            <div style="position: relative; width: 80px; height: 80px; margin: 0 auto 0.75rem;">
+                                                @if (!empty($juri['foto_profil']))
+                                                    <img src="{{ $juri['foto_profil'] }}" alt="{{ $juri['nama'] }}"
+                                                        style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; 
+                                                        border: 3px solid {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }}; 
+                                                        transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                                 @else
-                                                    <i class="fas fa-hourglass-half" style="animation: pulse-opacity 2s infinite;"></i>
+                                                    <div style="width: 80px; height: 80px; border-radius: 50%; 
+                                                        background: linear-gradient(135deg, var(--border-color) 0%, var(--bg-light) 100%); 
+                                                        border: 3px solid {{ $juri['scored'] ? '#28a745' : 'var(--border-color)' }}; 
+                                                        display: flex; align-items: center; justify-content: center; color: var(--text-muted); 
+                                                        transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                                        <i class="fas fa-user-tie" style="font-size: 2.2rem;"></i>
+                                                    </div>
                                                 @endif
+                                                
+                                                {{-- Status Badge Overlay --}}
+                                                <div style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; 
+                                                    background: {{ $juri['scored'] ? '#28a745' : '#6c757d' }}; 
+                                                    border: 3px solid var(--bg-white); color: white; 
+                                                    display: flex; align-items: center; justify-content: center; 
+                                                    font-size: 0.75rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                                                    transition: all 0.3s ease;">
+                                                    @if ($juri['scored'])
+                                                        <i class="fas fa-check"></i>
+                                                    @else
+                                                        <i class="fas fa-hourglass-half fa-xs" style="animation: pulse-opacity 2s infinite;"></i>
+                                                    @endif
+                                                </div>
                                             </div>
                                             <span style="font-weight: 700; color: var(--text-primary); font-size: 0.9rem; line-height: 1.2; margin-bottom: 0.5rem; display: block; word-wrap: break-word;">
                                                 {{ $juri['nama'] }}
@@ -343,8 +361,13 @@
             audio: null,
             init() {
                 this.audio = new Audio(this.src);
-                this.audio.loop = true;
+                this.audio.loop = false;
                 this.audio.volume = 0.4;
+
+                this.audio.addEventListener('ended', () => {
+                    this.shouldPlay = false;
+                });
+
                 if (this.shouldPlay) {
                     this.audio.play().catch(() => {
                         // Auto-play blocked — user interaction needed

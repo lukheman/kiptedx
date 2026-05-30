@@ -18,7 +18,7 @@ Atia Rahma Trimurti
 231220677
 password123
 
-mumaulana 
+Musmaulana 
 231220699
 password123
 
@@ -26,6 +26,6 @@ Taufik Hidayat
 231230732
 password123
 
-Alfat pandu kusuma 
+Alfat Pandu Kusuma 
 231210647
 password123

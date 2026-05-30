@@ -33,41 +33,6 @@ class DatabaseSeeder extends Seeder
                 'nim' => 'kharissyaban@kiptedx.site',
                 'password' => bcrypt('password123'),
             ],
-            [
-                'nama' => 'Anjar Pradipta, S.Kom., M.Kom',
-                'nim' => 'anjarpradipta@kiptedx.site',
-                'password' => bcrypt('password123'),
-            ],
-            [
-                'nama' => 'Wisnu Tri Sardi, S.Kom.,M.M',
-                'nim' => 'wisnutrisardi@kiptedx.site',
-                'password' => bcrypt('password123'),
-            ],
-            [
-                'nama' => 'Atia Rahma Trimurti',
-                'nim' => '231220677',
-                'password' => bcrypt('password123'),
-            ],
-            [
-                'nama' => 'mumaulana',
-                'nim' => '231220699',
-                'password' => bcrypt('password123'),
-            ],
-            [
-                'nama' => 'Taufik Hidayat',
-                'nim' => '231230732',
-                'password' => bcrypt('password123'),
-            ],
-            [
-                'nama' => 'Alfat pandu kusuma',
-                'nim' => '231210647',
-                'password' => bcrypt('password123'),
-            ],
-            [
-                'nama' => 'Juri',
-                'nim' => '242221120',
-                'password' => bcrypt('password123'),
-            ],
         ];
 
         foreach ($juris as $juri) {

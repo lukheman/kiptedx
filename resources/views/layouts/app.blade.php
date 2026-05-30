@@ -618,6 +618,7 @@
                 <x-sidebar-link href="{{ route('admin.tema') }}" icon="fas fa-tags" :active="request()->routeIs('admin.tema')">Tema</x-sidebar-link>
                 <x-sidebar-link href="{{ route('admin.juri') }}" icon="fas fa-user-tie" :active="request()->routeIs('admin.juri')">Juri</x-sidebar-link>
                 <x-sidebar-link href="{{ route('admin.presentasi') }}" icon="fas fa-chalkboard-teacher" :active="request()->routeIs('admin.presentasi')">Kontrol Presentasi</x-sidebar-link>
+                <x-sidebar-link href="{{ route('admin.nilai') }}" icon="fas fa-star" :active="request()->routeIs('admin.nilai')">Nilai Mahasiswa</x-sidebar-link>
                 <x-sidebar-link href="{{ route('admin.backsound') }}" icon="fas fa-music" :active="request()->routeIs('admin.backsound')">Backsound</x-sidebar-link>
             @endif
         </x-sidebar-section>

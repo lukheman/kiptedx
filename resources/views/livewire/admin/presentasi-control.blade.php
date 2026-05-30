@@ -413,9 +413,14 @@
                         if (this.currentSrc !== url) {
                             if (this.audio) { this.audio.pause(); }
                             this.audio = new Audio(url);
-                            this.audio.loop = true;
+                            this.audio.loop = false;
                             this.audio.volume = 0.5;
                             this.currentSrc = url;
+
+                            this.audio.addEventListener('ended', () => {
+                                this.isPlaying = false;
+                                $wire.stopBacksound();
+                            });
                         }
                         this.audio.play().catch(() => {});
                         this.isPlaying = true;
